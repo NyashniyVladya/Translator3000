@@ -71,6 +71,9 @@ init python:
             if text in langDict.iterkeys():
                 return langDict[text]
 
+            if not self.__setting.get(u"yandexTranslatorAPIKey", False):
+                return text
+
             try:
                 req = self.post(
                     self.TRANSLATOR_URL,
@@ -95,6 +98,9 @@ init python:
 
         @property
         def lang(self):
+            gameLanguage = self.__setting.get(u"gameLanguage", None)
+            if not gameLanguage:
+                return self.__setting[u"directionOfTranslation"]
             return u"{gameLanguage}-{directionOfTranslation}".format(
                 **self.__setting
             )

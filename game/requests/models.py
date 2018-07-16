@@ -165,12 +165,16 @@ class RequestHooksMixin(object):
         """Properly register a hook."""
 
         if event not in self.hooks:
-            raise ValueError('Unsupported event specified, with event name "%s"' % (event))
+            raise ValueError(
+                'Unsupported event specified, with event name "%s"' % (event)
+            )
 
         if isinstance(hook, collections.Callable):
             self.hooks[event].append(hook)
         elif hasattr(hook, '__iter__'):
-            self.hooks[event].extend(h for h in hook if isinstance(h, collections.Callable))
+            self.hooks[event].extend(
+                (h for h in hook if isinstance(h, collections.Callable))
+            )
 
     def deregister_hook(self, event, hook):
         """Deregister a previously registered hook.
@@ -209,7 +213,7 @@ class Request(RequestHooksMixin):
     """
 
     def __init__(self, method=None, url=None, headers=None, files=None,
-        data=None, params=None, auth=None, cookies=None, hooks=None, json=None):
+                 data=None, params=None, auth=None, cookies=None, hooks=None, json=None):
 
         # Default empty dicts for dict params.
         data = [] if data is None else data
@@ -286,8 +290,7 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         #: dictionary of callback hooks, for internal usage.
         self.hooks = default_hooks()
 
-    def prepare(self, method=None, url=None, headers=None, files=None,
-        data=None, params=None, auth=None, cookies=None, hooks=None, json=None):
+    def prepare(self, method=None, url=None, headers=None, files=None, data=None, params=None, auth=None, cookies=None, hooks=None, json=None):
         """Prepares the entire request with the given parameters."""
 
         self.prepare_method(method)
@@ -348,13 +351,21 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
             raise InvalidURL(*e.args)
 
         if not scheme:
-            error = ("Invalid URL {0!r}: No schema supplied. Perhaps you meant http://{0}?")
+            error = (
+                "Invalid URL {0!r}: No schema supplied. Perhaps you meant http://{0}?"
+            )
             error = error.format(to_native_string(url, 'utf8'))
 
             raise MissingSchema(error)
 
         if not host:
             raise InvalidURL("Invalid URL %r: No host supplied" % url)
+
+        # Only want to apply IDNA to the hostname
+        try:
+            host = host.encode('idna').decode('utf-8')
+        except Exception:
+            pass
 
         # Carefully reconstruct the network location
         netloc = auth or ''
