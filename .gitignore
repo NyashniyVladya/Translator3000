@@ -102,6 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+tmp/*
+game/saves/
 game/options.rpy
 game/screens.rpy
 *.rpyc
+*.rpyb
+log.txt
+vladya_translator_database.json
+vladya_translator_setting.json
