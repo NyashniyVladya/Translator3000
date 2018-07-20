@@ -12,7 +12,7 @@ init python:
     class Translator3000(Session):
 
         __author__ = u"Vladya"
-        __version__ = (1, 0, 0)
+        __version__ = (1, 1, 0)
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"
@@ -31,6 +31,10 @@ init python:
             )
         )
 
+        YANDEX_API_KEY_PLACEHOLDER = (
+            u"Write your key here, replacing this text."
+        )
+
         def __init__(self):
 
             super(self.__class__, self).__init__()
@@ -42,7 +46,7 @@ init python:
                     u"directionOfTranslation":
                         u"ru",
                     u"yandexTranslatorAPIKey":
-                        u"Write your key here, replacing this text."
+                        self.YANDEX_API_KEY_PLACEHOLDER
                 }
                 self.save_setting()
 
@@ -58,6 +62,7 @@ init python:
 
         def __call__(self, text):
 
+            _start_text = text
             text = self.substitute(text).strip()
 
             langDict = self.__database.setdefault(
@@ -71,36 +76,35 @@ init python:
             if text in langDict.iterkeys():
                 return langDict[text]
 
-            if not self.__setting.get(u"yandexTranslatorAPIKey", False):
-                return text
+            APIKey = self.__setting.get(u"yandexTranslatorAPIKey", None)
+            if (APIKey == self.YANDEX_API_KEY_PLACEHOLDER) or (not APIKey):
+                return _start_text
 
             try:
                 req = self.post(
                     self.TRANSLATOR_URL,
                     data={
-                        u"key": self.__setting[u"yandexTranslatorAPIKey"],
+                        u"key": APIKey,
                         u"text": text,
                         u"lang": self.lang
                     }
                 )
+                req.raise_for_status()
                 data = req.json().get(u"text", [])
                 data = u'\n'.join(data).strip()
                 data = self.uni(data)
                 if not data:
-                    return text
+                    return _start_text
 
                 langDict[text] = data
                 self.backup_database()
                 return data
 
             except Exception:
-                return text
+                return _start_text
 
         @property
         def lang(self):
-            gameLanguage = self.__setting.get(u"gameLanguage", None)
-            if not gameLanguage:
-                return self.__setting[u"directionOfTranslation"]
             return u"{gameLanguage}-{directionOfTranslation}".format(
                 **self.__setting
             )
@@ -123,6 +127,7 @@ init python:
 
         @classmethod
         def substitute(cls, s):
+            s = renpy.translation.notags_filter(s)
             s %= renpy.exports.tag_quoting_dict
             s = renpy.substitutions.substitute(s)[0]
             return cls.uni(s)
