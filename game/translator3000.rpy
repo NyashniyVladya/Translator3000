@@ -12,7 +12,7 @@ init python:
     class Translator3000(Session):
 
         __author__ = u"Vladya"
-        __version__ = (1, 1, 0)
+        __version__ = (1, 1, 1)
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"

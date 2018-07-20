@@ -104,7 +104,6 @@ venv.bak/
 .mypy_cache/
 tmp/*
 game/saves/
-game/options.rpy
 game/screens.rpy
 *.rpyc
 *.rpyb
