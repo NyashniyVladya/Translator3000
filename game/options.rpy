@@ -1,7 +1,7 @@
 
 init python:
 
-    build.directory_name = "Translator3000-1.1.1"
+    build.directory_name = "Translator3000-1.2.0"
     build.executable_name = "Translator3000"
 
     build.include_update = False

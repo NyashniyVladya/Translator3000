@@ -12,7 +12,7 @@ init python:
     class Translator3000(Session):
 
         __author__ = u"Vladya"
-        __version__ = (1, 1, 1)
+        __version__ = (1, 2, 0)
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"
@@ -39,6 +39,11 @@ init python:
 
             super(self.__class__, self).__init__()
 
+            try:
+                self._notags_filter = renpy.translation.notags_filter
+            except Exception:
+                self._notags_filter = renpy.translation.dialogue.notags_filter
+
             if not path.isfile(self.SETTING):
                 self.__setting = {
                     u"gameLanguage":
@@ -63,7 +68,7 @@ init python:
         def __call__(self, text):
 
             _start_text = text
-            text = self.substitute(text).strip()
+            text = self._format_text(text).strip()
 
             langDict = self.__database.setdefault(
                 self.__setting[u"gameLanguage"],
@@ -125,12 +130,18 @@ init python:
             filecopy(backup, filename)
             remove(backup)
 
-        @classmethod
-        def substitute(cls, s):
-            s = renpy.translation.notags_filter(s)
+        @staticmethod
+        def _substitute(s):
+            s = renpy.substitutions.substitute(s)
+            if isinstance(s, basestring):
+                return s
+            return s[0]
+
+        def _format_text(self, s):
+            s = self._notags_filter(s)
             s %= renpy.exports.tag_quoting_dict
-            s = renpy.substitutions.substitute(s)[0]
-            return cls.uni(s)
+            s = self._substitute(s)
+            return self.uni(s)
 
         @staticmethod
         def uni(s):
