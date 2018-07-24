@@ -2,6 +2,7 @@
 init python:
 
     import json
+    from threading import Lock
     from requests import Session
     from shutil import copy as filecopy
     from os import (
@@ -9,10 +10,10 @@ init python:
         remove
     )
 
-    class Translator3000(Session):
+    class _Translator3000(Session):
 
         __author__ = u"Vladya"
-        __version__ = (1, 2, 0)
+        __version__ = (1, 3, 0)
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"
@@ -65,35 +66,36 @@ init python:
             with open(self.DATABASE, "rb") as _file:
                 self.__database = json.load(_file)
 
+            self.__network_lock = Lock()
+
         def __call__(self, text):
 
             _start_text = text
             text = self._format_text(text).strip()
 
-            langDict = self.__database.setdefault(
+            text_translations = self.__database.setdefault(
                 self.__setting[u"gameLanguage"],
                 {}
-            ).setdefault(
-                self.__setting[u"directionOfTranslation"],
-                {}
-            )
+            ).setdefault(text, {})
 
-            if text in langDict.iterkeys():
-                return langDict[text]
+            needLang = self.__setting[u"directionOfTranslation"]
+            if needLang in text_translations.iterkeys():
+                return text_translations[needLang]
 
             APIKey = self.__setting.get(u"yandexTranslatorAPIKey", None)
             if (APIKey == self.YANDEX_API_KEY_PLACEHOLDER) or (not APIKey):
                 return _start_text
 
             try:
-                req = self.post(
-                    self.TRANSLATOR_URL,
-                    data={
-                        u"key": APIKey,
-                        u"text": text,
-                        u"lang": self.lang
-                    }
-                )
+                with self.__network_lock:
+                    req = self.post(
+                        self.TRANSLATOR_URL,
+                        data={
+                            u"key": APIKey,
+                            u"text": text,
+                            u"lang": self.lang
+                        }
+                    )
                 req.raise_for_status()
                 data = req.json().get(u"text", [])
                 data = u'\n'.join(data).strip()
@@ -101,7 +103,7 @@ init python:
                 if not data:
                     return _start_text
 
-                langDict[text] = data
+                text_translations[needLang] = data
                 self.backup_database()
                 return data
 
@@ -150,4 +152,4 @@ init python:
                 s = s.decode("utf-8", "ignore")
             return s
 
-    config.say_menu_text_filter = Translator3000()
+    config.say_menu_text_filter = _Translator3000()
