@@ -10,10 +10,10 @@ init python:
         remove
     )
 
-    class _Translator3000(Session):
+    class _Translator3000(Session, NoRollback):
 
         __author__ = u"Vladya"
-        __version__ = (1, 3, 0)
+        __version__ = (1, 3, 1)
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"
@@ -61,10 +61,10 @@ init python:
                 self.backup_database()
 
             with open(self.SETTING, "rb") as _file:
-                self.__setting = json.load(_file)
+                self.__setting = json.load(_file, encoding="utf-8")
 
             with open(self.DATABASE, "rb") as _file:
-                self.__database = json.load(_file)
+                self.__database = json.load(_file, encoding="utf-8")
 
             self.__network_lock = Lock()
 
@@ -122,13 +122,22 @@ init python:
         def backup_database(self):
             self._write_json(json_data=self.__database, filename=self.DATABASE)
 
-        @staticmethod
-        def _write_json(json_data, filename):
+        @classmethod
+        def _write_json(cls, json_data, filename):
+
+            data = json.dumps(
+                json_data,
+                ensure_ascii=False,
+                encoding="utf-8",
+                indent=4
+            )
+            data = cls.uni(data)
 
             name, _ = path.splitext(filename)
             backup = u"{0}.backup".format(name)
             with open(backup, "wb") as _file:
-                json.dump(json_data, _file, indent=4)
+                _file.write(data.encode("utf-8"))
+
             filecopy(backup, filename)
             remove(backup)
 
