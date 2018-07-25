@@ -13,7 +13,8 @@ init python:
     class _Translator3000(Session, NoRollback):
 
         __author__ = u"Vladya"
-        __version__ = (1, 3, 2)
+        __version__ = (1, 4, 0)
+        __database_version__ = 2
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"
@@ -27,7 +28,7 @@ init python:
         )
         DATABASE = path.abspath(
             path.join(
-                renpy.config.basedir,
+                path.expanduser(u"~"),
                 u"vladya_translator_database.json"
             )
         )
@@ -49,6 +50,13 @@ init python:
             self.__network_lock = Lock()
             self.__file_lock = Lock()
 
+            if path.isfile(self.DATABASE):
+                with open(self.DATABASE, "rb") as _file:
+                    _db = json.load(_file, encoding="utf-8")
+                _file_version = _db.get(u"database_version", 0)
+                if self.__database_version__ > _file_version:
+                    remove(self.DATABASE)
+
             if not path.isfile(self.SETTING):
                 self.__setting = {
                     u"gameLanguage":
@@ -61,7 +69,10 @@ init python:
                 self.save_setting()
 
             if not path.isfile(self.DATABASE):
-                self.__database = {}
+                self.__database = {
+                    u"database_version": self.__database_version__,
+                    u"database": {}
+                }
                 self.backup_database()
 
             with open(self.SETTING, "rb") as _file:
@@ -83,7 +94,7 @@ init python:
             text = self._format_text(text).strip()
 
             with self.__database_lock:
-                text_translations = self.__database.setdefault(
+                text_translations = self.__database[u"database"].setdefault(
                     self.__setting[u"gameLanguage"],
                     {}
                 ).setdefault(text, {})
