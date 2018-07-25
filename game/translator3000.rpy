@@ -1,4 +1,4 @@
-﻿
+
 init python:
 
     import json
@@ -13,7 +13,7 @@ init python:
     class _Translator3000(Session, NoRollback):
 
         __author__ = u"Vladya"
-        __version__ = (1, 4, 0)
+        __version__ = (1, 4, 1)
         __database_version__ = 2
 
         TRANSLATOR_URL = (
@@ -163,15 +163,15 @@ init python:
 
         @staticmethod
         def _substitute(s):
-            s = renpy.substitutions.substitute(s)
+            s = renpy.substitutions.substitute(s, force=True, translate=True)
             if isinstance(s, basestring):
                 return s
             return s[0]
 
         def _format_text(self, s):
-            s = self._notags_filter(s)
-            s %= renpy.exports.tag_quoting_dict
             s = self._substitute(s)
+            s %= renpy.exports.tag_quoting_dict
+            s = self._notags_filter(s)
             return self.uni(s)
 
         @staticmethod
