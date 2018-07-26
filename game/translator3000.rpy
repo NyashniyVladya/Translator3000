@@ -13,7 +13,7 @@ init python:
     class _Translator3000(Session, NoRollback):
 
         __author__ = u"Vladya"
-        __version__ = (1, 4, 1)
+        __version__ = (1, 4, 2)
         __database_version__ = 2
 
         TRANSLATOR_URL = (
@@ -91,7 +91,7 @@ init python:
         def __call__(self, text):
 
             _start_text = text
-            text = self._format_text(text).strip()
+            text = self.unquote(text).strip()
 
             with self.__database_lock:
                 text_translations = self.__database[u"database"].setdefault(
@@ -123,7 +123,7 @@ init python:
                     return _start_text
             except Exception:
                 return _start_text
-
+            data = self.quote(data)
             with self.__database_lock:
                 text_translations[needLang] = data
             self.backup_database()
@@ -168,11 +168,18 @@ init python:
                 return s
             return s[0]
 
-        def _format_text(self, s):
+        def unquote(self, s):
             s = self._substitute(s)
             s %= renpy.exports.tag_quoting_dict
             s = self._notags_filter(s)
             return self.uni(s)
+
+        @classmethod
+        def quote(cls, s):
+            s = cls.uni(s)
+            for a, b in {u'[': u"[[", u'{': u"{{", u'%': u"%%"}.iteritems():
+                s = s.replace(a, b)
+            return s
 
         @staticmethod
         def uni(s):

@@ -16,6 +16,7 @@ init 1 python:
     build.classify(u"**/.**", None)
     build.classify(u"**/#**", None)
     build.classify(u"**/thumbs.db", None)
+    build.classify(u"**.rpy", None)
     build.classify(u"game/options.*", None)
     build.classify(u"game/cache/**", None)
     build.classify(u"game/saves/**", None)
