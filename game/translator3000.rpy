@@ -2,6 +2,7 @@
 init python:
 
     import json
+    import __builtin__ as bltIn
     from threading import Lock
     from requests import Session
     from shutil import copy as filecopy
@@ -13,8 +14,10 @@ init python:
     class _Translator3000(Session, NoRollback):
 
         __author__ = u"Vladya"
-        __version__ = (1, 4, 2)
+        __version__ = (1, 5, 0)
         __database_version__ = 2
+
+        ATTEMPTS_COUNT = 5
 
         TRANSLATOR_URL = (
             u"https://translate.yandex.net/api/v1.5/tr.json/translate"
@@ -41,6 +44,8 @@ init python:
 
             super(self.__class__, self).__init__()
 
+            self._persistent_object = MultiPersistent(u"Translator3000")
+
             try:
                 self._notags_filter = renpy.translation.notags_filter
             except Exception:
@@ -58,13 +63,17 @@ init python:
                     remove(self.DATABASE)
 
             if not path.isfile(self.SETTING):
+                _api_key = self._persistent_object.yandex_api_key
+                if not self._check_api_key(_api_key):
+                    _api_key = self.YANDEX_API_KEY_PLACEHOLDER
+
                 self.__setting = {
                     u"gameLanguage":
                         u"en",
                     u"directionOfTranslation":
                         u"ru",
                     u"yandexTranslatorAPIKey":
-                        self.YANDEX_API_KEY_PLACEHOLDER
+                        _api_key
                 }
                 self.save_setting()
 
@@ -81,12 +90,55 @@ init python:
             with open(self.DATABASE, "rb") as _file:
                 self.__database = json.load(_file, encoding="utf-8")
 
+        def _check_api_key(self, api_key):
+            if (api_key == self.YANDEX_API_KEY_PLACEHOLDER) or (not api_key):
+                return False
+            try:
+                test_request = self._translate_with_yandex(
+                    text=u"Test",
+                    api_key=api_key,
+                    lang=u"en-ru"
+                )
+            except:
+                return False
+            else:
+                return bool(test_request)
+
         def request(self, *args, **kwargs):
+            _super_obj = super(self.__class__, self)
+            exc = None
             with self.__network_lock:
-                resp = super(self.__class__, self).request(*args, **kwargs)
-                self.close()
-                resp.raise_for_status()
-                return resp
+                for _i in xrange(self.ATTEMPTS_COUNT):
+                    try:
+                        resp = _super_obj.request(*args, **kwargs)
+                    except Exception as exc:
+                        continue
+                    else:
+                        resp.raise_for_status()
+                        return resp
+                    finally:
+                        self.close()
+                if isinstance(exc, Exception):
+                    raise exc
+                raise Exception(u"Undefined error.")
+
+        def _translate_with_yandex(self, text, api_key, lang=None):
+            if (api_key == self.YANDEX_API_KEY_PLACEHOLDER) or (not api_key):
+                raise Exception(u"\"{0}\" is wrong key.".format(api_key))
+            if not hasattr(text, u"__iter__"):
+                text = [text]
+            text = list(bltIn.map(self.uni, text))
+            resp = self.post(
+                self.TRANSLATOR_URL,
+                data={
+                    u"key": api_key,
+                    u"text": text,
+                    u"lang": (lang or self.lang)
+                },
+                timeout=30.
+            )
+            data = resp.json().get(u"text", [])
+            return u'\n'.join(data).strip()
 
         def __call__(self, text):
 
@@ -104,21 +156,21 @@ init python:
                     return text_translations[needLang]
 
                 APIKey = self.__setting.get(u"yandexTranslatorAPIKey", None)
-                if (APIKey == self.YANDEX_API_KEY_PLACEHOLDER) or (not APIKey):
+
+            if (APIKey == self.YANDEX_API_KEY_PLACEHOLDER) or (not APIKey):
+                APIKey = self._persistent_object.yandex_api_key
+                if not self._check_api_key(APIKey):
                     return _start_text
+
+                with self.__database_lock:
+                    self.__setting[u"yandexTranslatorAPIKey"] = APIKey
+                self.save_setting()
+
             try:
-                resp = self.post(
-                    self.TRANSLATOR_URL,
-                    data={
-                        u"key": APIKey,
-                        u"text": text,
-                        u"lang": self.lang
-                    },
-                    timeout=30.
+                data = self._translate_with_yandex(
+                    text=text,
+                    api_key=APIKey
                 )
-                data = resp.json().get(u"text", [])
-                data = u'\n'.join(data).strip()
-                data = self.uni(data)
                 if not data:
                     return _start_text
             except Exception:
@@ -127,6 +179,11 @@ init python:
             with self.__database_lock:
                 text_translations[needLang] = data
             self.backup_database()
+
+            if self._persistent_object.yandex_api_key != APIKey:
+                self._persistent_object.yandex_api_key = APIKey
+                self._persistent_object.save()
+
             return data
 
         @property
