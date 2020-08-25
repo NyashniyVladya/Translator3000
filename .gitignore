@@ -130,8 +130,11 @@ dmypy.json
 *.rpymc
 game/cache/*
 game/saves/*
+tmp/*
 log.txt
 errors.txt
 traceback.txt
+
+#Extra files.
 _translator3000_setting.json
 Translator3000.rpa
