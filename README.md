@@ -1,2 +1,5 @@
 # Translator3000
-Для обращения к сервису перевода используется [модуль renpy-requests](https://github.com/renpytom/renpy-requests "renpy-requests").
+
+### Автоматический переводчик игр на движке Ren'Py на основе Google переводчика.
+
+[Инструкция пользования и скомпилированный *.rpa* для использования в играх.](https://github.com/NyashniyVladya/Translator3000/releases)
