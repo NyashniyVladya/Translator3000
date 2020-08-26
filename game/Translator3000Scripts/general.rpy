@@ -147,7 +147,11 @@ init -9 python in _translator3000:
                 _string_setting_backup = _string_setting_backup.encode("utf_8")
             _setting_backup = io.BytesIO(_string_setting_backup)
             with open(temp_fn, "wb") as _file:
-                _file.write(_setting_backup.read((2 ** 20)))
+                while True:
+                    chunk = _setting_backup.read((2 ** 20))
+                    if not chunk:
+                        break
+                    _file.write(chunk)
             if path.isfile(self._user_setting_file):
                 os.remove(self._user_setting_file)
             os.rename(temp_fn, self._user_setting_file)

@@ -87,7 +87,11 @@ class Translator(object):
                 os.makedirs(directory)
             temp_fn = u"{0}.temp".format(self.translations_json_path)
             with open(temp_fn, "wb") as _file:
-                _file.write(json_dump_bytes.read((2 ** 20)))
+                while True:
+                    chunk = json_dump_bytes.read((2 ** 20))
+                    if not chunk:
+                        break
+                    _file.write(chunk)
             if path.isfile(self.translations_json_path):
                 os.remove(self.translations_json_path)
             os.rename(temp_fn, self.translations_json_path)

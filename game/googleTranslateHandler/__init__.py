@@ -9,7 +9,7 @@ from os import path
 from .web_handler import WebHandler
 
 __author__ = "Vladya"
-__version__ = "1.0"
+__version__ = "1.1.0"
 
 logging.basicConfig()
 LOGGER = logging.getLogger("GoogleTranslateModule")

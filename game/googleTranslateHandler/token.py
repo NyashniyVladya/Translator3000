@@ -46,9 +46,9 @@ class TokenGenerator(object):
                 self.LOGGER.debug("'tkk' not defined. Updating.")
             self.__update_tkk_from_web()
 
-        token_time = time.localtime((float(self.__tkk) * 60 * 60))
-        current_time = time.localtime()
-        if current_time.tm_hour != token_time.tm_hour:
+        token_hour = int(self.__tkk.split('.')[0])
+        current_hour = int(((time.time() / 60.) / 60.))
+        if current_hour != token_hour:
             self.LOGGER.debug("'tkk' time is over. Updating.")
             self.__update_tkk_from_web()
 
