@@ -6,6 +6,7 @@ init -10 python in _translator3000:
     import json
     import types
     import logging
+    import threading
     from os import path
     from googleTranslateHandler import (
         LOGGER,

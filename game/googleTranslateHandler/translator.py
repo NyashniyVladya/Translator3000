@@ -33,13 +33,14 @@ class Translator(object):
     def __init__(self):
 
         self._token_generator = token.TokenGenerator()
+        self.__hdd_lock = threading.Lock()
         self.__database_lock = threading.Lock()
         self.__database = {}
         if path.isfile(self.translations_json_path):
             with open(self.translations_json_path, "rb") as _file:
                 self.__database = json.load(_file)
 
-    def translate(self, text, dest, src):
+    def translate(self, text, dest, src, _update_on_hdd=True):
 
         dest, src = map(self._get_lang_code, (dest, src))
 
@@ -72,12 +73,23 @@ class Translator(object):
 
             text_db[dest] = result
 
-            # Update database on HDD.
+        if _update_on_hdd:
+            self._backup_database()
+
+        return result
+
+    def _backup_database(self):
+
+        with self.__hdd_lock:
+
             self.LOGGER.debug("Start creating backup on HDD.")
-            json_dump_bytes = json.dumps(
-                self.__database,
-                ensure_ascii=False
-            )
+
+            with self.__database_lock:
+                json_dump_bytes = json.dumps(
+                    self.__database,
+                    ensure_ascii=False
+                )
+
             if isinstance(json_dump_bytes, unicode):
                 json_dump_bytes = json_dump_bytes.encode("utf_8")
             json_dump_bytes = io.BytesIO(json_dump_bytes)
@@ -96,8 +108,6 @@ class Translator(object):
                 os.remove(self.translations_json_path)
             os.rename(temp_fn, self.translations_json_path)
             self.LOGGER.debug("Backup is created.")
-
-            return result
 
     def _translate_with_web(self, text, dest, src):
 

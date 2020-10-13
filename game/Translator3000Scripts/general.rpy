@@ -1,5 +1,5 @@
 
-init -9 python in _translator3000:
+init -8 python in _translator3000:
 
     class Translator3000(NoRollback):
 
@@ -22,14 +22,37 @@ init -9 python in _translator3000:
             if path.isfile(self._user_setting_file):
                 with open(self._user_setting_file, "rb") as _file:
                     self._setting = json.load(_file)
+                if "prescan" not in self._setting:
+                    # Файл был создан до введения предварительного скана.
+                    self._setting["prescan"] = False
+                    self._dump_setting()
             else:
                 self._setting = {
                     "gameLanguage": None,
-                    "directionOfTranslation": None
+                    "directionOfTranslation": None,
+                    "prescan": False
                 }
                 self._dump_setting()
 
-        def __call__(self, text):
+            self._translate_preparer = Preparer(translator_object=self)
+
+        @classmethod
+        def turn_on(cls):
+
+            _tr_object = cls()
+
+            config.say_menu_text_filter = _tr_object
+
+            if _tr_object._setting["prescan"]:
+
+                renpy.game.post_init.append(
+                    _tr_object._translate_preparer.start
+                )
+                config.overlay_functions.append(
+                    _tr_object._translate_preparer._show_scan_status
+                )
+
+        def __call__(self, text, _update_on_hdd=True):
             """
             Непосредственно - метод перевода.
             """
@@ -37,7 +60,8 @@ init -9 python in _translator3000:
                 result = self._translator_object.translate(
                     text=self.unquote(text),
                     dest=self.direction_of_translation_code,
-                    src=self.game_language_code
+                    src=self.game_language_code,
+                    _update_on_hdd=_update_on_hdd
                 )
             except Exception as ex:
                 if DEBUG:
@@ -195,4 +219,4 @@ init -9 python in _translator3000:
                     return code
             return None
 
-    config.say_menu_text_filter = Translator3000()
+    Translator3000.turn_on()

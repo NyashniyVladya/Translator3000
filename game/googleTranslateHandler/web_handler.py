@@ -6,6 +6,7 @@ Handling requests to the network.
 """
 
 import time
+import random
 import urllib2
 from threading import Lock
 
@@ -29,7 +30,7 @@ class WebHandler(object):
 
     __author__ = "Vladya"
 
-    RPM = 100.  # Requests per minute.
+    RPM = 120.  # Requests per minute.
     headers = {
         "User-Agent": (  # Pretending a browser.
             "Mozilla/5.0 (Windows NT 6.3; Win64; x64) "
@@ -81,11 +82,12 @@ class WebHandler(object):
         with host_info._lock:
 
             if host_info._last_request is not None:
+                _rpm = self.RPM * random.uniform(.75, 1.)
                 while True:
                     time_after_request = time.time() - host_info._last_request
-                    if time_after_request >= (60. / self.RPM):
+                    if time_after_request >= (60. / _rpm):
                         break
-                    time.sleep(.01)
+                    time.sleep(.1)
             try:
                 if self.logger:
                     self.logger.debug("Try to open \"%s\".", url.geturl())
