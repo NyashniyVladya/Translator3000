@@ -1,11 +1,16 @@
 ﻿
-label start:
+init -100 python:
+    renpy.add_python_directory("Translator3000Data/third_party_python_modules")
+    renpy.add_python_directory("Translator3000Data/my_python_modules")
+    # TODO Ренпаевская часть.
 
+label start:
+    
     while True:
         menu:
-            "Собрать билду":
+            "Собрать билду.":
                 if _translator3000.DEBUG:
                     "Внимание! Билда собирается с включённым режимом дебага."
-                $ _translator3000build._RPA.create_build(build.name)
-                "Собрано."
+                $ _build_creator.RPACreator.create_build(build.name)
+                "Собрано!"
     return
