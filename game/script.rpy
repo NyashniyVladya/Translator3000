@@ -2,7 +2,6 @@
 init -100 python:
     renpy.add_python_directory("Translator3000Data/third_party_python_modules")
     renpy.add_python_directory("Translator3000Data/my_python_modules")
-    # TODO Ренпаевская часть.
 
 label start:
     
