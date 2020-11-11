@@ -48,7 +48,13 @@ class GoogleTranslator(object):
         if not isinstance(text, unicode):
             text = text.decode("utf_8", "ignore")
 
-        self.LOGGER.debug("Start translating from %s to %s.", src, dest)
+        _text = (text if (len(text) <= 100) else u"{0}...".format(text[:97]))
+        self.LOGGER.debug(
+            "Start translating \"%s\" from %s to %s.",
+            _text.encode("utf_8", "ignore"),
+            utils._get_lang_name(src).lower(),
+            utils._get_lang_name(dest).lower()
+        )
         with self.__database_lock:
 
             source_lang_db = self.__database.setdefault(src, {})

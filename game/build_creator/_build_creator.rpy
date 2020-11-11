@@ -140,7 +140,7 @@ init 10 python in _build_creator:
                 renpy_name="Translator3000Data/third_party_python_modules",
                 pack_name=_gamedir,
                 _type="folder",
-                exts=('.pem', '.py')
+                exts=(".pem", ".py")
             ),
             PackingData(
                 renpy_name="Translator3000Data/scripts",

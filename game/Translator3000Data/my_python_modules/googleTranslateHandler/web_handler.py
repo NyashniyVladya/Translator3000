@@ -33,9 +33,11 @@ class WebHandler(requests.Session):
         super(WebHandler, self).__init__()
 
         self.headers["User-Agent"] = (
-            # Pretending a IE browser.
-            "Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) "
-            "like Gecko"
+            # Pretending a chrome browser.
+            "Mozilla/5.0 (Windows NT 6.3; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/86.0.4240.193 "
+            "Safari/537.36"
         )
 
         self.__request_lock = threading.Lock()
@@ -84,6 +86,7 @@ class WebHandler(requests.Session):
 
                 self.__request_lock.acquire()
                 try:
+                    self.close()
                     result = super(WebHandler, self).request(
                         method,
                         url,

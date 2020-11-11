@@ -73,10 +73,25 @@ def _get_lang_code(language_data):
     raise ValueError("Code \"{0}\" is not detected.".format(language_data))
 
 
-def _save_data_to_file(bytedata, out_fn):
+def _get_lang_name(language_data):
+    lang_code = _get_lang_code(language_data)
+    return consts.LANG_CODES[lang_code][0]
 
-    if not isinstance(bytedata, basestring):
-        raise TypeError("'bytedata' should be a string.")
+
+def _save_data_to_file(data, out_fn):
+
+    if isinstance(data, basestring):
+        bytedata = data
+    elif (hasattr(data, "read") and hasattr(data, "seek")):
+        data.seek(0)
+        bytedata = ""
+        while True:
+            chunk = data.read((2 ** 20))
+            if not chunk:
+                break
+            bytedata += chunk
+    else:
+        raise TypeError("'data' should be file-object or string.")
 
     if isinstance(bytedata, unicode):
         bytedata = bytedata.encode("utf_8")

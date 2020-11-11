@@ -6,8 +6,11 @@
 import time
 import re
 import threading
+from os import path
 from . import (
     LOGGER,
+    DEBUG_FOLDER,
+    utils,
     _url_getter,
     _url_opener
 )
@@ -61,8 +64,12 @@ class TokenGenerator(object):
             _counter += 1
             self.LOGGER.debug("Updating 'TKK'. Attempt %d.", _counter)
             result = _url_opener.get(_url_getter.base)
-            new_tkk = self._tkk_re.search(result.text)
+            new_tkk = self._tkk_re.search(result.content)
             if not new_tkk:
+                utils._save_data_to_file(
+                    result.content,
+                    path.join(DEBUG_FOLDER, u"page_without_token.html")
+                )
                 if _counter >= self.MAX_ATTEMPT:
                     raise Exception("Not find 'TKK'.")
                 self.LOGGER.error("Not find 'TKK'. Try again...")
@@ -86,6 +93,9 @@ class TokenGenerator(object):
 
         Deobfuscation is based on the logic implemented by a "ssut"
         in the project "py-googletrans", adapted to specific needs.
+
+        LINK: https://github.com/ssut/py-googletrans/blob/
+        4f7c0798fe6b235164b47d4542536f562795a419/googletrans/gtoken.py#L137
         """
 
         self.LOGGER.debug("Start generating token for the text.")
