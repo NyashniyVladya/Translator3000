@@ -68,14 +68,15 @@ class Translator(translator_abstract.TranslatorAbstract):
             text = text.decode("utf_8", "ignore")
 
         _text = (text if (len(text) <= 100) else u"{0}...".format(text[:97]))
-        self.LOGGER.debug(
-            "Start translating \"%s\" from %s to %s.",
-            _text.encode("utf_8", "ignore"),
-            utils._get_lang_name(src).lower(),
-            utils._get_lang_name(dest).lower()
-        )
 
         with self._database_lock:
+
+            self.LOGGER.debug(
+                "Start translating \"%s\" from %s to %s.",
+                _text.encode("utf_8", "ignore"),
+                utils._get_lang_name(src).lower(),
+                utils._get_lang_name(dest).lower()
+            )
 
             _lang_db = self._database.setdefault(src, {})
             _text_db = _lang_db.setdefault(text, {})

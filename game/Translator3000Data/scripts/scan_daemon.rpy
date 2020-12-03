@@ -20,12 +20,16 @@ init -9 python in _translator3000:
 
             self._status = None
             self._completed = False
+            self._last_exception = None
 
         def _overlay_callable(self, *screen_args, **screen_kwargs):
 
             """
             Демонстрация статуса сканирования.
             """
+
+            if DEBUG and self._last_exception:
+                raise self._last_exception
 
             if (not self._completed) and self._status:
                 _done, _scope_of_work = self._status
@@ -61,7 +65,12 @@ init -9 python in _translator3000:
                 for counter, say_node in enumerate(say_objects):
                     self._status = (counter, text_len)
                     renpy.restart_interaction()  # Для перерисовки статуса.
-                    self._translator(say_node.what, _update_on_hdd=False)
+                    try:
+                        self._translator(say_node.what, _update_on_hdd=False)
+                    except Exception as ex:
+                        self.LOGGER.exception(ex.message)
+                        self._last_exception = ex
+                        continue
             finally:
                 self._translator._translator_object.backup_database()
                 self._status = None

@@ -83,15 +83,14 @@ class WebHandler(requests.Session):
                             break
                         time.sleep(.1)
 
-                self.LOGGER.debug(
-                    "Try send '%s' request to '%s'. Attempt %d.",
-                    method,
-                    _url.hostname,
-                    _counter
-                )
-
                 self.__request_lock.acquire()
                 try:
+                    self.LOGGER.debug(
+                        "Try send '%s' request to '%s'. Attempt %d.",
+                        method,
+                        _url.hostname,
+                        _counter
+                    )
                     self.close()
                     result = super(WebHandler, self).request(
                         method,
