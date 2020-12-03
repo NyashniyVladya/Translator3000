@@ -65,6 +65,10 @@ init -9 python in _translator3000:
                 for counter, say_node in enumerate(say_objects):
                     self._status = (counter, text_len)
                     renpy.restart_interaction()  # Для перерисовки статуса.
+                    if not hasattr(say_node, "what"):
+                        continue
+                    if not isinstance(say_node.what, basestring):
+                        continue
                     try:
                         self._translator(say_node.what, _update_on_hdd=False)
                     except Exception as ex:
@@ -72,7 +76,8 @@ init -9 python in _translator3000:
                         self._last_exception = ex
                         continue
             finally:
-                self._translator._translator_object.backup_database()
+                self._translator.backup_database()
                 self._status = None
                 self._completed = True
+                renpy.restart_interaction()
                 self.LOGGER.debug(b"Pre-scan is complete.")

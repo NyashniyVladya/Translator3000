@@ -109,6 +109,10 @@ init -8 python in _translator3000:
                 _backup = _backup.encode("utf_8")
             utils.save_data_to_file(_backup, self._user_setting_file)
 
+        def backup_database(self):
+            _service = self._setting["translationService"]
+            return self._translator_object.backup_database(_service)
+
         @staticmethod
         def _substitute(s):
             """
@@ -124,10 +128,16 @@ init -8 python in _translator3000:
             Преобразуется форматированный текст в "чистый",
             без тегов, переменных и т.п.
             """
-            # Подстановка значений вида "[variable]".
-            s = self._substitute(s)
-            # То же, но для "%(variable)s".
-            s %= renpy.tag_quoting_dict
+            try:
+                # Подстановка значений вида "[variable]".
+                s = self._substitute(s)
+            except KeyError:
+                pass
+            try:
+                # То же, но для "%(variable)s".
+                s %= renpy.tag_quoting_dict
+            except KeyError:
+                pass
             # Удаление тегов из текста вида "{b}{i}Some text.{/i}{/b}".
             s = renpy.translation.dialogue.notags_filter(s)
             return s

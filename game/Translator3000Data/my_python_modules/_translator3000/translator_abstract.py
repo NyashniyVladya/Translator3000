@@ -29,9 +29,9 @@ class TranslatorAbstract(object):
 
     def backup_database(self):
 
-        self.LOGGER.debug("Database backup has been requested.")
-
         with self._hdd_lock:
+
+            self.LOGGER.debug("Database backup has been requested.")
 
             with self._database_lock:
                 database_dump_bytes = json.dumps(
