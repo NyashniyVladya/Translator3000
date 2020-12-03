@@ -96,8 +96,12 @@ init -8 python in _translator3000:
             return translated_text
 
         def _history_callback(self, entry_object):
+            if not hasattr(entry_object, "translator3000_original_what"):
+                entry_object.translator3000_original_what = self._get_original(
+                    entry_object.what
+                )
             if self._setting["originalInHistory"]:
-                entry_object.what = self._get_original(entry_object.what)
+                entry_object.what = entry_object.translator3000_original_what
 
         def _dump_setting(self):
             _backup = json.dumps(self._setting, ensure_ascii=False, indent=4)
