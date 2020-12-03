@@ -4,6 +4,8 @@ init -8 python in _translator3000:
     class Translator3000(NoRollback):
 
         __author__ = "Vladya"
+
+        LOGGER = LOGGER.getChild("Translator3000")
         _user_setting_file = path.abspath(
             path.join(config.basedir, "_translator3000_setting.json")
         )
@@ -12,7 +14,9 @@ init -8 python in _translator3000:
             "gameLanguage": None,
             "directionOfTranslation": None,
             "prescan": False,
-            "_debug_mode": False
+            "_debug_mode": False,
+            "translationService": "google",
+            "originalInHistory": False
         }
 
         def __init__(self):
@@ -20,7 +24,12 @@ init -8 python in _translator3000:
             self._setting = {}
             if path.isfile(self._user_setting_file):
                 with open(self._user_setting_file, "rb") as _file:
-                    self._setting = json.load(_file)
+                    try:
+                        _setting = json.load(_file)
+                    except ValueError:
+                        raise Exception(__("Ошибка при чтении настроек."))
+                    else:
+                        self._setting = _setting.copy()
 
             _need_dump = False
             for k, v in self.DEFAULT_SETTING.iteritems():
@@ -31,7 +40,9 @@ init -8 python in _translator3000:
             if _need_dump:
                 self._dump_setting()
 
-            self._translator_object = translator.GoogleTranslator()
+            self._original_mapping = {}
+
+            self._translator_object = translator.Translator()
             self._translate_preparer = Preparer(translator_object=self)
 
         @classmethod
@@ -39,11 +50,9 @@ init -8 python in _translator3000:
 
             _tr_object = cls()
 
-            config.say_menu_text_filter = _tr_object
-
             if _tr_object._setting["_debug_mode"]:
                 store._translator3000.DEBUG = True
-                LOGGER.setLevel(logging.DEBUG)
+                parent_logger.setLevel(logging.DEBUG)
 
             if _tr_object._setting["prescan"]:
 
@@ -55,8 +64,11 @@ init -8 python in _translator3000:
                     _tr_object._translate_preparer.start()
 
                 config.overlay_functions.append(
-                    _tr_object._translate_preparer._show_scan_status
+                    _tr_object._translate_preparer._overlay_callable
                 )
+
+            config.say_menu_text_filter = _tr_object
+            config.history_callbacks.append(_tr_object._history_callback)
 
         def __call__(self, text, _update_on_hdd=True):
             """
@@ -64,22 +76,34 @@ init -8 python in _translator3000:
             """
             try:
                 result = self._translator_object.translate(
+                    service=self._setting["translationService"],
                     text=self.unquote(text),
-                    dest=self.direction_of_translation_code,
-                    src=self.game_language_code,
+                    dest=self.direction_of_translation,
+                    src=self.game_language,
                     _update_on_hdd=_update_on_hdd
                 )
             except Exception as ex:
                 if DEBUG:
                     raise ex
                 return text
-            return self.quote(result)
+            result = self.quote(result)
+            self._original_mapping[result] = text
+            return result
+
+        def _get_original(self, translated_text):
+            if translated_text in self._original_mapping:
+                return self._original_mapping[translated_text]
+            return translated_text
+
+        def _history_callback(self, entry_object):
+            if self._setting["originalInHistory"]:
+                entry_object.what = self._get_original(entry_object.what)
 
         def _dump_setting(self):
             _backup = json.dumps(self._setting, ensure_ascii=False, indent=4)
             if isinstance(_backup, unicode):
                 _backup = _backup.encode("utf_8")
-            utils._save_data_to_file(_backup, self._user_setting_file)
+            utils.save_data_to_file(_backup, self._user_setting_file)
 
         @staticmethod
         def _substitute(s):
@@ -114,7 +138,7 @@ init -8 python in _translator3000:
             return s
 
         @property
-        def game_language_code(self):
+        def game_language(self):
 
             """
             Язык игры с которого будет переводиться текст.
@@ -125,11 +149,15 @@ init -8 python in _translator3000:
             как самый популярный язык новелл.
             """
 
-            if self._setting["gameLanguage"]:
+            if self._setting["gameLanguage"] is not None:
                 try:
-                    code = utils._get_lang_code(self._setting["gameLanguage"])
-                except ValueError:
-                    pass
+                    code = self._translator_object.get_lang_code(
+                        service=self._setting["translationService"],
+                        data=self._setting["gameLanguage"]
+                    )
+                except Exception as ex:
+                    if DEBUG:
+                        raise ex
                 else:
                     return code
 
@@ -137,27 +165,32 @@ init -8 python in _translator3000:
             if code:
                 return code
 
-            return utils._get_lang_code("English")
+            return self._translator_object.get_lang_code(
+                service=self._setting["translationService"],
+                data="English"
+            )
 
         @property
-        def direction_of_translation_code(self):
+        def direction_of_translation(self):
 
             """
             Язык направления перевода, на который будет переводиться текст.
 
             Сначала проверяем настройки юзера;
             если их нет - пытаемся определить язык операционной системы;
-            если и это не удалось - ставим русский,
-            потому что... Потому что - почему бы и нет.
+            если и это не удалось - ставим русский, потому что...
+            Потому что - почему бы и нет.
             """
 
-            if self._setting["directionOfTranslation"]:
+            if self._setting["directionOfTranslation"] is not None:
                 try:
-                    code = utils._get_lang_code(
-                        self._setting["directionOfTranslation"]
+                    code = self._translator_object.get_lang_code(
+                        service=self._setting["translationService"],
+                        data=self._setting["directionOfTranslation"]
                     )
-                except ValueError:
-                    pass
+                except Exception as ex:
+                    if DEBUG:
+                        raise ex
                 else:
                     return code
 
@@ -170,7 +203,10 @@ init -8 python in _translator3000:
                 if code:
                     return code
 
-            return utils._get_lang_code("Russian")
+            return self._translator_object.get_lang_code(
+                service=self._setting["translationService"],
+                data="Russian"
+            )
 
         def detect_game_language_code(self):
 
@@ -182,8 +218,11 @@ init -8 python in _translator3000:
                 return None
 
             try:
-                code = utils._get_lang_code(_preferences.language)
-            except ValueError:
+                code = self._translator_object.get_lang_code(
+                    service=self._setting["translationService"],
+                    data=_preferences.language
+                )
+            except Exception:
                 return None
             else:
                 return code
@@ -205,8 +244,11 @@ init -8 python in _translator3000:
                 if not variant:
                     continue
                 try:
-                    code = utils._get_lang_code(variant)
-                except ValueError:
+                    code = self._translator_object.get_lang_code(
+                        service=self._setting["translationService"],
+                        data=variant
+                    )
+                except Exception:
                     continue
                 else:
                     return code

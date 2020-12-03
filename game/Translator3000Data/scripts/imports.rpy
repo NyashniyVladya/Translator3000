@@ -14,11 +14,12 @@ init -10 python in _translator3000:
         config,
         _preferences
     )
-    from googleTranslateHandler import (
-        LOGGER,
+    from _translator3000 import (
+        LOGGER as parent_logger,
         translator,
         utils
     )
 
     DEBUG = False
-    LOGGER.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))
+    parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))
+    LOGGER = parent_logger.getChild("Ren'Py")

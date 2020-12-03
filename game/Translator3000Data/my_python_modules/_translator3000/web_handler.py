@@ -4,8 +4,8 @@
 """
 
 import time
-import threading
 import random
+import threading
 import requests
 from requests.packages import urllib3
 
@@ -28,7 +28,16 @@ class WebHandler(requests.Session):
     RPM = 100.  # Requests per minute.
     MAX_ATTEMPTS = 5
 
-    def __init__(self, logger=None):
+    single_instance = None
+
+    def __new__(cls, logger_object):
+
+        if cls.single_instance is None:
+            cls.single_instance = super(WebHandler, cls).__new__(cls)
+
+        return cls.single_instance
+
+    def __init__(self, logger_object):
 
         super(WebHandler, self).__init__()
 
@@ -40,14 +49,12 @@ class WebHandler(requests.Session):
             "Safari/537.36"
         )
 
+        self.LOGGER = logger_object.getChild("WebHandler")
+
         self.__request_lock = threading.Lock()
 
         self.__create_host_object_lock = threading.Lock()
         self.__hosts = {}
-
-        self.LOGGER = None
-        if logger:
-            self.LOGGER = logger.getChild("WebHandler")
 
     def request(self, method, url, *args, **kwargs):
 
@@ -76,13 +83,12 @@ class WebHandler(requests.Session):
                             break
                         time.sleep(.1)
 
-                if self.LOGGER:
-                    self.LOGGER.debug(
-                        "Try send '%s' request to '%s'. Attempt %d.",
-                        method,
-                        _url.hostname,
-                        _counter
-                    )
+                self.LOGGER.debug(
+                    "Try send '%s' request to '%s'. Attempt %d.",
+                    method,
+                    _url.hostname,
+                    _counter
+                )
 
                 self.__request_lock.acquire()
                 try:
@@ -95,8 +101,7 @@ class WebHandler(requests.Session):
                     )
                 except Exception as _last_exception:
                     #  Request was not sent. Do not update time.
-                    if self.LOGGER:
-                        self.LOGGER.error(_last_exception.message)
+                    self.LOGGER.error(_last_exception.message)
                     continue
                 else:
                     #  Request was sent. Update time and check HTTP errors.
@@ -104,17 +109,15 @@ class WebHandler(requests.Session):
                     try:
                         result.raise_for_status()
                     except Exception as _last_exception:
-                        if self.LOGGER:
-                            self.LOGGER.error(_last_exception.message)
+                        self.LOGGER.error(_last_exception.message)
                         continue
                     else:
-                        if self.LOGGER:
-                            self.LOGGER.debug(
-                                "'%s' request to '%s' was successful. %d.",
-                                method,
-                                _url.hostname,
-                                result.status_code
-                            )
+                        self.LOGGER.debug(
+                            "'%s' request to '%s' was successful. %d.",
+                            method,
+                            _url.hostname,
+                            result.status_code
+                        )
                         return result
                 finally:
                     self.close()

@@ -9,6 +9,8 @@ init -9 python in _translator3000:
 
         __author__ = "Vladya"
 
+        LOGGER = LOGGER.getChild("Preparer")
+
         def __init__(self, translator_object):
 
             super(Preparer, self).__init__()
@@ -19,7 +21,7 @@ init -9 python in _translator3000:
             self._status = None
             self._completed = False
 
-        def _show_scan_status(self, *screen_args, **screen_kwargs):
+        def _overlay_callable(self, *screen_args, **screen_kwargs):
 
             """
             Демонстрация статуса сканирования.
@@ -55,6 +57,7 @@ init -9 python in _translator3000:
             text_len = len(say_objects)
 
             try:
+                self.LOGGER.debug(b"Pre-scanning process is started.")
                 for counter, say_node in enumerate(say_objects):
                     self._status = (counter, text_len)
                     renpy.restart_interaction()  # Для перерисовки статуса.
@@ -63,3 +66,4 @@ init -9 python in _translator3000:
                 self._translator._translator_object.backup_database()
                 self._status = None
                 self._completed = True
+                self.LOGGER.debug(b"Pre-scan is complete.")

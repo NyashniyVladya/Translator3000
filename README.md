@@ -1,7 +1,7 @@
 # Translator3000
 
-### Автоматический переводчик игр на движке Ren'Py на основе Google переводчика.
+### Automatic translator of games made on Ren'Py engine.
 
-[Инструкция пользования и скомпилированный *.rpa* для использования в играх.](https://github.com/NyashniyVladya/Translator3000/releases)
+[Instruction manual and compiled *.rpa* file for use in games.](https://github.com/NyashniyVladya/Translator3000/releases)
 
-*Работает на версиях Ren'Py 6.99.12.4 и новее.*
+*Works in games made on Ren'Py 6.99.12.4 and newer.*
