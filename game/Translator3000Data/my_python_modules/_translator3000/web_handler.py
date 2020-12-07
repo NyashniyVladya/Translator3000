@@ -75,7 +75,12 @@ class WebHandler(requests.Session):
             with host_object._lock:
 
                 if host_object._last_request is not None:
+                    if self.RPM <= .0:
+                        raise Exception("Incorrect RPM value.")
                     _rpm = self.RPM * random.uniform(.75, 1.)
+                    if _rpm <= .0:
+                        # If 'self.RPM' is equal to a very small value.
+                        _rpm = self.RPM
                     _need_to_wait = 60. / _rpm
                     while True:
                         _waiting_time = time.time() - host_object._last_request

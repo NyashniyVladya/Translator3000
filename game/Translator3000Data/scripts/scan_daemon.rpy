@@ -1,5 +1,5 @@
 
-init -9 python in _translator3000:
+init -8 python in _translator3000:
 
     class Preparer(threading.Thread, NoRollback):
 
@@ -33,16 +33,12 @@ init -9 python in _translator3000:
 
             if (not self._completed) and self._status:
                 _done, _scope_of_work = self._status
-                ui.text(
+                _translator._ui_text(
                     __("Переведено {0} строк из {1} ({2:.1%}).").format(
                         _done,
                         _scope_of_work,
                         (float(_done) / float(_scope_of_work))
-                    ),
-                    color="#fff",
-                    outlines=[(2, "#000", 0, 0)],
-                    anchor=(.0, .0),
-                    pos=(.01, .01)
+                    )
                 )
 
         def run(self):
@@ -65,6 +61,9 @@ init -9 python in _translator3000:
                 for counter, say_node in enumerate(say_objects):
                     self._status = (counter, text_len)
                     renpy.restart_interaction()  # Для перерисовки статуса.
+                    if ((counter % 100) == 0):
+                        # Сохраняем бэкап на ЖД каждые 100 запросов.
+                        self._translator.backup_database()
                     if not hasattr(say_node, "what"):
                         continue
                     if not isinstance(say_node.what, basestring):

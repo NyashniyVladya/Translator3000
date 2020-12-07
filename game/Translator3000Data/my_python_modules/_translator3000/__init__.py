@@ -14,7 +14,7 @@ from . import (
 )
 
 __author__ = "Vladya"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 utils.remove_dir(_paths.TEMP_FOLDER)
 utils.remove_dir(_paths.DEBUG_FOLDER)

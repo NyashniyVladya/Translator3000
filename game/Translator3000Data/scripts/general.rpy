@@ -1,5 +1,5 @@
 
-init -8 python in _translator3000:
+init -7 python in _translator3000:
 
     class Translator3000(NoRollback):
 
@@ -16,7 +16,13 @@ init -8 python in _translator3000:
             "prescan": False,
             "_debug_mode": False,
             "translationService": "google",
-            "originalInHistory": False
+            "originalInHistory": False,
+            "requestsFrequency": None,
+            "extraTextOptions": {
+                "font": None,
+                "italic": False,
+                "bold": False
+            }
         }
 
         def __init__(self):
@@ -31,12 +37,10 @@ init -8 python in _translator3000:
                     else:
                         self._setting = _setting.copy()
 
-            _need_dump = False
-            for k, v in self.DEFAULT_SETTING.iteritems():
-                if k not in self._setting:
-                    self._setting[k] = v
-                    _need_dump = True
-
+            _need_dump = self._dict_multisetdefault(
+                self._setting,
+                self.DEFAULT_SETTING
+            )
             if _need_dump:
                 self._dump_setting()
 
@@ -44,6 +48,7 @@ init -8 python in _translator3000:
 
             self._translator_object = translator.Translator()
             self._translate_preparer = Preparer(translator_object=self)
+            self._github_checker = GitChecker(translator_object=self)
 
         @classmethod
         def turn_on(cls):
@@ -54,6 +59,10 @@ init -8 python in _translator3000:
                 store._translator3000.DEBUG = True
                 parent_logger.setLevel(logging.DEBUG)
 
+            if _tr_object._setting["requestsFrequency"] is not None:
+                _frq = float(_tr_object._setting["requestsFrequency"])
+                current_session.RPM = _frq
+
             if _tr_object._setting["prescan"]:
 
                 if renpy.game.context().init_phase:
@@ -63,31 +72,97 @@ init -8 python in _translator3000:
                 else:
                     _tr_object._translate_preparer.start()
 
-                config.overlay_functions.append(
-                    _tr_object._translate_preparer._overlay_callable
-                )
-
             config.say_menu_text_filter = _tr_object
+            config.overlay_functions.append(_tr_object._overlay_callable)
             config.history_callbacks.append(_tr_object._history_callback)
 
-        def __call__(self, text, _update_on_hdd=True):
+        def _overlay_callable(self):
+            ui.vbox(anchor=(.0, .0), pos=(.01, .01))
+            if self._setting["prescan"]:
+                self._translate_preparer._overlay_callable()
+            self._github_checker._overlay_callable()
+            ui.close()
+
+        @staticmethod
+        def _ui_text(text):
+            return ui.text(text, color="#fff", outlines=[(2, "#000", 0, 0)])
+
+        @staticmethod
+        def _ui_textbutton(text, clicked):
+            return ui.textbutton(
+                text,
+                clicked=clicked,
+                text_color="#fff",
+                text_hover_color="#888",
+                text_outlines=[(2, "#000", 0, 0)]
+            )
+
+        @classmethod
+        def _dict_multisetdefault(cls, dct, default):
+
+            """
+            Устанавливает для 'dct' ключи из 'default', если их там нет.
+            Возвращает булевое значение - был ли обновлён словарь.
+            """
+
+            _list = __builtin__.list
+            _dict = __builtin__.dict
+
+            updated = False
+            for k, v in default.iteritems():
+
+                if k not in dct:
+                    dct[k] = copy.deepcopy(v)
+                    updated = True
+
+                if (isinstance(dct[k], _dict) and isinstance(v, _dict)):
+                    _updated = cls._dict_multisetdefault(dct[k], v)
+                    if _updated:
+                        updated = True
+
+            return updated
+
+        def __call__(self, text, _update_on_hdd=True, **extra_kwargs):
+
             """
             Непосредственно - метод перевода.
             """
+
+            _write_in_origin = extra_kwargs.pop("_write_in_origin", True)
+
             try:
-                result = self._translator_object.translate(
-                    service=self._setting["translationService"],
-                    text=self.unquote(text),
-                    dest=self.direction_of_translation,
-                    src=self.game_language,
-                    _update_on_hdd=_update_on_hdd
-                )
+
+                _params = {
+                    "service": self._setting["translationService"],
+                    "text": self.unquote(text),
+                    "dest": self.direction_of_translation,
+                    "src": self.game_language,
+                    "_update_on_hdd": _update_on_hdd
+                }
+                _params.update(extra_kwargs)
+                result = self._translator_object.translate(**_params)
+
             except Exception as ex:
                 if DEBUG:
                     raise ex
                 return text
+
             result = self.quote(result)
-            self._original_mapping[result] = text
+
+            if self._setting["extraTextOptions"]["font"] is not None:
+                result = self._add_text_tag(
+                    result,
+                    "font",
+                    self._setting["extraTextOptions"]["font"]
+                )
+            if self._setting["extraTextOptions"]["bold"]:
+                result = self._add_text_tag(result, 'b')
+            if self._setting["extraTextOptions"]["italic"]:
+                result = self._add_text_tag(result, 'i')
+
+            if _write_in_origin:
+                self._original_mapping[result] = text
+
             return result
 
         def _get_original(self, translated_text):
@@ -112,6 +187,14 @@ init -8 python in _translator3000:
         def backup_database(self):
             _service = self._setting["translationService"]
             return self._translator_object.backup_database(_service)
+
+        @staticmethod
+        def _add_text_tag(text, tag, value=None):
+            if value is not None:
+                _format_string = "{{{1}={2}}}{0}{{/{1}}}"
+            else:
+                _format_string = "{{{1}}}{0}{{/{1}}}"
+            return _format_string.format(text, tag, value)
 
         @staticmethod
         def _substitute(s):
