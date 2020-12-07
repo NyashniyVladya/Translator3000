@@ -18,3 +18,11 @@ translate english strings:
     old "Собрать билду."
     new "Assemble the project."
 
+# TODO: Translation updated at 2020-12-07 15:17
+
+translate english strings:
+
+    # game/script.rpy:17
+    old "Версии сборки и проекта не равны."
+    new "Build and project versions are not equal."
+

@@ -20,7 +20,14 @@ init -9 python in _translator3000:
             self.__lock = threading.Lock()
             self.__ui_lock = threading.Lock()
 
+            self.__need_init_process = True
             self._download_process = None
+
+        def init_download_process(self):
+
+            self.__need_init_process = False
+            self._download_process = None
+
             try:
                 if self.is_need_update():
                     self._download_process = Downloader(
@@ -36,6 +43,9 @@ init -9 python in _translator3000:
         def _overlay_callable(self):
 
             with self.__ui_lock:
+
+                if self.__need_init_process:
+                    self.init_download_process()
 
                 if self._download_process:
 
@@ -86,13 +96,14 @@ init -9 python in _translator3000:
                         self._translator._ui_text(_text)
                         self._translator._ui_textbutton(
                             __("Начать загрузку."),
-                            clicked=Function(_download_process.start)
+                            clicked=Function(self._download_process.start)
                         )
 
                     ui.close()
 
         def _hide_ui(self):
             with self.__ui_lock:
+                self.__need_init_process = False
                 self._download_process = None
 
         def is_need_update(self):
@@ -127,8 +138,11 @@ init -9 python in _translator3000:
             with self.__lock:
                 if self.__json_answer is None:
                     url = self.get_url("/repos/{owner}/{repo}/releases/latest")
-                    with requests.get(url) as _request:
+                    _request = requests.get(url)
+                    try:
                         self.__json_answer = _request.json()
+                    finally:
+                        _request.close()
                 return self.__json_answer
 
         @property
@@ -197,7 +211,7 @@ init -9 python in _translator3000:
         @property
         def total_size(self):
             if not self.__total_size:
-                return .01
+                return float("+inf")
             return self._b_to_mb(self.__total_size)
 
         def is_running(self):
@@ -224,12 +238,16 @@ init -9 python in _translator3000:
                 self.__is_running = True
                 temp_fn = "{0}.tmp".format(self.__out_fn)
                 utils.create_dir_for_file(temp_fn)
-                with requests.get(self.__url, stream=True) as _stream:
+                _stream = requests.get(self.__url, stream=True)
+                try:
                     self.__total_size = int(_stream.headers["Content-Length"])
                     with open(temp_fn, "wb") as _write_file:
                         for chunk in _stream.iter_content((2 ** 10)):
                             _write_file.write(chunk)
                             self.__current_size += len(chunk)
+                            renpy.restart_interaction()
+                finally:
+                    _stream.close()
                 if path.isfile(self.__out_fn):
                     os.remove(self.__out_fn)
                 utils.create_dir_for_file(self.__out_fn)
@@ -239,3 +257,4 @@ init -9 python in _translator3000:
             finally:
                 self.__is_running = False
                 self.__is_over = True
+                renpy.restart_interaction()

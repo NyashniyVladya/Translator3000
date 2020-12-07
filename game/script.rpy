@@ -10,8 +10,16 @@ init -100 python in _compile_build_init:
         renpy.add_python_directory(_path)
         config.search_prefixes.append(_path)
 
+
+init 1 python in _compile_build_init:
+
+    from store import _translator3000
+
+    if _translator3000.VERSION != tuple(map(int, config.version.split('.'))):
+        raise Exception(__("Версии сборки и проекта не равны."))
+
 label start:
-    
+
     while True:
         menu:
             "Собрать билду.":
