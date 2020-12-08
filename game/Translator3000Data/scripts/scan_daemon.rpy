@@ -33,7 +33,7 @@ init -8 python in _translator3000:
 
             if (not self._completed) and self._status:
                 _done, _scope_of_work = self._status
-                _translator._ui_text(
+                self._translator._ui_text(
                     __("Переведено {0} строк из {1} ({2:.1%}).").format(
                         _done,
                         _scope_of_work,
