@@ -19,10 +19,12 @@ from . import (
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
+
+    SYMB_LIMIT = 5000
 
     BASE_URL = urllib3.util.Url(
         scheme="https",
@@ -67,13 +69,30 @@ class Translator(translator_abstract.TranslatorAbstract):
         if not isinstance(text, unicode):
             text = text.decode("utf_8", "ignore")
 
-        _text = (text if (len(text) <= 100) else u"{0}...".format(text[:97]))
+        parts = tuple(self.get_parts_from_text(text))
+        if len(parts) > 1:
+
+            def _translate_child(txt):
+                return self.translate(txt, dest, src, _update_on_hdd)
+
+            return self.join_parts_to_text(map(_translate_child, parts))
+
+        elif not parts:
+            return u""
+
+        text = parts[0]
+        if len(text) >= self.SYMB_LIMIT:
+            text = u"{0}...".format(text[:(self.SYMB_LIMIT - 4)].strip())
+
+        _text_for_log = text
+        if len(_text_for_log) >= 100:
+            _text_for_log = u"{0}...".format(_text_for_log[:96].strip())
 
         with self._database_lock:
 
             self.LOGGER.debug(
                 "Start translating \"%s\" from %s to %s.",
-                _text.encode("utf_8", "ignore"),
+                _text_for_log.encode("utf_8", "ignore"),
                 utils._get_lang_name(src).lower(),
                 utils._get_lang_name(dest).lower()
             )

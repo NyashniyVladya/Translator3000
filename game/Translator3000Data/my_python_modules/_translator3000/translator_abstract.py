@@ -12,7 +12,7 @@ from . import utils
 class TranslatorAbstract(object):
 
     __author__ = "Vladya"
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     LOGGER = None
     DATABASE_FN = None
@@ -44,6 +44,20 @@ class TranslatorAbstract(object):
 
             utils.save_data_to_file(database_dump_bytes, self.DATABASE_FN)
             self.LOGGER.debug("Backup has been created.")
+
+    @staticmethod
+    def get_parts_from_text(text):
+        if not isinstance(text, basestring):
+            raise TypeError("'text' should be a string.")
+        if not isinstance(text, unicode):
+            text = text.decode("utf_8")
+        for t in text.split(u'\n'):
+            yield t
+
+    @staticmethod
+    def join_parts_to_text(parts):
+        parts = tuple(parts)
+        return u'\n'.join(parts)
 
     def translate(self, text, dest, src, _update_on_hdd=True):
         raise NotImplementedError("Should be redefined.")
