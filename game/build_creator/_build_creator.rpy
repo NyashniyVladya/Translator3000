@@ -149,8 +149,8 @@ init 10 python in _build_creator:
                 exts=(".rpyc",)
             ),
             PackingData(
-                renpy_name="tl/english/Translator3000Data/scripts",
-                pack_name="tl/english/Translator3000Scripts",
+                renpy_name="tl/compileEngNone/Translator3000Data/scripts",
+                pack_name="tl/None/Translator3000Scripts",
                 _type="folder",
                 exts=(".rpyc",)
             )

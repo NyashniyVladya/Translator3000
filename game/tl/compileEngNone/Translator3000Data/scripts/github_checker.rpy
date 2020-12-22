@@ -1,6 +1,6 @@
 ﻿# TODO: Translation updated at 2020-12-07 13:53
 
-translate english strings:
+translate None strings:
 
     # game/Translator3000Data/scripts/github_checker.rpy:47
     old "Загружено {0:.2f}Мб из {1:.2f}."
@@ -28,7 +28,7 @@ translate english strings:
 
 # TODO: Translation updated at 2020-12-07 14:00
 
-translate english strings:
+translate None strings:
 
     # game/Translator3000Data/scripts/github_checker.rpy:74
     old "На GitHub доступно обновление переводчика.\nВерсия {0[0]}.{0[1]}.{0[2]} (текущая {1[0]}.{1[1]}.{1[2]}).\nРазмер {2:.2f}Мб."
