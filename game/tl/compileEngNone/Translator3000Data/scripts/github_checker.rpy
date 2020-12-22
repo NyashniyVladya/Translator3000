@@ -30,3 +30,6 @@ init -20:
         # game/Translator3000Data/scripts/github_checker.rpy:74
         old "На GitHub доступно обновление переводчика.\nВерсия {0[0]}.{0[1]}.{0[2]} (текущая {1[0]}.{1[1]}.{1[2]}).\nРазмер {2:.2f}Мб."
         new "A translator update is available at GitHub.\nVersion {0[0]}.{0[1]}.{0[2]} (current {1[0]}.{1[1]}.{1[2]}).\nSize {2:.2f}Mb."
+
+        old "{0:.2f} Мбит/сек"
+        new "{0:.2f} Mbit/sec"

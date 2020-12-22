@@ -61,7 +61,9 @@ init -9 python in _translator3000:
                             )
                         )
                         self._translator._ui_text(
-                            "{0} Mbit/s".format(self._download_process.speed)
+                            __("{0:.2f} Мбит/сек").format(
+                                self._download_process.speed
+                            )
                         )
                         ui.bar(1., self._download_process.status, xmaximum=200)
 
@@ -193,9 +195,7 @@ init -9 python in _translator3000:
             self.__is_over = False
             self.__exception = None
 
-            # Для подсчёта скорости загрузки.
-            self.__last_timestamp = None
-            # Значение в байтах в секунду.
+            # Скорость загрузки. Значение в байтах в секунду.
             self.__speed = None
 
         @staticmethod
@@ -259,15 +259,23 @@ init -9 python in _translator3000:
                 try:
                     self.__total_size = int(_stream.headers["Content-Length"])
                     with open(temp_fn, "wb") as _write_file:
-                        self.__last_timestamp = time.time()
+                        data_number = 0
+                        last_timestamp = time.time()
                         for chunk in _stream.iter_content((2 ** 10)):
                             chunk_size = len(chunk)
                             _write_file.write(chunk)
                             self.__current_size += chunk_size
-                            elapsed = time.time() - self.__last_timestamp
-                            if elapsed > .0:
-                                self.__speed = chunk_size / elapsed
-                            self.__last_timestamp = time.time()
+                            data_number += chunk_size
+                            if data_number >= (2 ** 15):
+                                # Считаем скорость на основе последних 32Кб.
+                                _timestamp = time.time()
+                                elapsed = _timestamp - last_timestamp
+                                if elapsed > .0:
+                                    self.__speed = float(data_number) / elapsed
+                                else:
+                                    self.__speed = float("+inf")
+                                data_number = 0
+                                last_timestamp = _timestamp
                             renpy.restart_interaction()
                 finally:
                     _stream.close()
@@ -280,6 +288,5 @@ init -9 python in _translator3000:
             finally:
                 self.__is_running = False
                 self.__is_over = True
-                self.__last_timestamp = None
                 self.__speed = None
                 renpy.restart_interaction()
