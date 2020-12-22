@@ -20,6 +20,7 @@ init -7 python in _translator3000:
             "requestsFrequency": None,
             "extraTextOptions": {
                 "font": None,
+                "size": None,
                 "italic": False,
                 "bold": False
             }
@@ -105,7 +106,6 @@ init -7 python in _translator3000:
             Возвращает булевое значение - был ли обновлён словарь.
             """
 
-            _list = __builtin__.list
             _dict = __builtin__.dict
 
             updated = False
@@ -149,12 +149,13 @@ init -7 python in _translator3000:
 
             result = self.quote(result)
 
-            if self._setting["extraTextOptions"]["font"] is not None:
-                result = self._add_text_tag(
-                    result,
-                    "font",
-                    self._setting["extraTextOptions"]["font"]
-                )
+            for _tag in ("font", "size"):
+                if self._setting["extraTextOptions"][_tag] is not None:
+                    result = self._add_text_tag(
+                        result,
+                        _tag,
+                        self._setting["extraTextOptions"][_tag]
+                    )
             if self._setting["extraTextOptions"]["bold"]:
                 result = self._add_text_tag(result, 'b')
             if self._setting["extraTextOptions"]["italic"]:
