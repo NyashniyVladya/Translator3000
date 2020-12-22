@@ -5,6 +5,7 @@ init -10 python in _translator3000:
     # Код пишется с расчётом, что дефолтные строки являются юникодом.
 
     import __builtin__
+    import time
     import copy
     import os
     import logging
@@ -27,7 +28,7 @@ init -10 python in _translator3000:
         utils
     )
 
-    VERSION = (2, 4, 10)
+    VERSION = (2, 4, 11)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))

@@ -1,8 +1,8 @@
-﻿# TODO: Translation updated at 2020-12-03 15:24
+﻿# TODO: Translation updated at 2020-12-23 02:12
 
 translate english strings:
 
     # game/options.rpy:15
-    old "Translator3000"
-    new "Translator3000"
+    old "Translator3000. Сборщик релиза."
+    new "Translator3000. Build compiler."
 

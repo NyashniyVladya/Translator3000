@@ -60,6 +60,9 @@ init -9 python in _translator3000:
                                 self._download_process.total_size
                             )
                         )
+                        self._translator._ui_text(
+                            "{0} Mbit/s".format(self._download_process.speed)
+                        )
                         ui.bar(1., self._download_process.status, xmaximum=200)
 
                     elif self._download_process.is_over():
@@ -190,9 +193,23 @@ init -9 python in _translator3000:
             self.__is_over = False
             self.__exception = None
 
+            # Для подсчёта скорости загрузки.
+            self.__last_timestamp = None
+            # Значение в байтах в секунду.
+            self.__speed = None
+
         @staticmethod
         def _b_to_mb(value):
             return ((float(value) / (2. ** 10.)) / (2. ** 10.))
+
+        @property
+        def speed(self):
+            """
+            Скорость в Мбит/с.
+            """
+            if self.__speed is None:
+                return .0
+            return (self._b_to_mb(self.__speed) * 8.)
 
         @property
         def status(self):
@@ -242,9 +259,15 @@ init -9 python in _translator3000:
                 try:
                     self.__total_size = int(_stream.headers["Content-Length"])
                     with open(temp_fn, "wb") as _write_file:
+                        self.__last_timestamp = time.time()
                         for chunk in _stream.iter_content((2 ** 10)):
+                            chunk_size = len(chunk)
                             _write_file.write(chunk)
-                            self.__current_size += len(chunk)
+                            self.__current_size += chunk_size
+                            elapsed = time.time() - self.__last_timestamp
+                            if elapsed > .0:
+                                self.__speed = chunk_size / elapsed
+                            self.__last_timestamp = time.time()
                             renpy.restart_interaction()
                 finally:
                     _stream.close()
@@ -257,4 +280,6 @@ init -9 python in _translator3000:
             finally:
                 self.__is_running = False
                 self.__is_over = True
+                self.__last_timestamp = None
+                self.__speed = None
                 renpy.restart_interaction()
