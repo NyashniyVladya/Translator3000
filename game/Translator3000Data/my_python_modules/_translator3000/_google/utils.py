@@ -8,6 +8,9 @@ from . import consts
 
 def _get_lang_code(language_data):
 
+    if not isinstance(language_data, basestring):
+        raise TypeError("Language id should be a string.")
+
     def _format(t):
         return t.lower().strip().replace('-', '_')
 

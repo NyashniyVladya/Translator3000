@@ -34,6 +34,10 @@ class Translator(object):
         translator = self._get_translator(service)
         return translator.get_lang_code(data)
 
+    def get_lang_name(self, service, data):
+        translator = self._get_translator(service)
+        return translator.get_lang_name(data)
+
     def backup_database(self, service):
         translator = self._get_translator(service)
         return translator.backup_database()

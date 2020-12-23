@@ -19,7 +19,7 @@ from . import (
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
@@ -54,13 +54,14 @@ class Translator(translator_abstract.TranslatorAbstract):
         ).url
 
     def get_lang_code(self, data):
-        if not isinstance(data, basestring):
-            return TypeError("Language id should be a string.")
         return utils._get_lang_code(data)
+
+    def get_lang_name(self, data):
+        return utils._get_lang_name(data)
 
     def translate(self, text, dest, src, _update_on_hdd=True):
 
-        dest, src = map(utils._get_lang_code, (dest, src))
+        dest, src = map(self.get_lang_code, (dest, src))
         text = text.strip()
 
         if not text:
@@ -93,8 +94,8 @@ class Translator(translator_abstract.TranslatorAbstract):
             self.LOGGER.debug(
                 "Start translating \"%s\" from %s to %s.",
                 _text_for_log.encode("utf_8", "ignore"),
-                utils._get_lang_name(src).lower(),
-                utils._get_lang_name(dest).lower()
+                self.get_lang_name(src).lower(),
+                self.get_lang_name(dest).lower()
             )
 
             _lang_db = self._database.setdefault(src, {})
@@ -170,7 +171,7 @@ class Translator(translator_abstract.TranslatorAbstract):
             ]
         """
 
-        dest, src = map(utils._get_lang_code, (dest, src))
+        dest, src = map(self.get_lang_code, (dest, src))
         if not isinstance(text, unicode):
             text = text.decode("utf_8", "ignore")
 
