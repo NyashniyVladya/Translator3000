@@ -12,6 +12,7 @@ from .. import (
 )
 from . import (
     utils,
+    consts,
     _paths,
     LOGGER
 )
@@ -19,7 +20,7 @@ from . import (
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
@@ -58,6 +59,10 @@ class Translator(translator_abstract.TranslatorAbstract):
 
     def get_lang_name(self, data):
         return utils._get_lang_name(data)
+
+    def get_all_lang_codes(self):
+        for code in consts.LANG_CODES.iterkeys():
+            yield code
 
     def translate(self, text, dest, src, _update_on_hdd=True):
 

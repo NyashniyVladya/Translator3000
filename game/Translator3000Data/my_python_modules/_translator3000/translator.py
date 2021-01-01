@@ -18,6 +18,9 @@ class Translator(object):
         for translator_name, _Translator in self.CLASSES.iteritems():
             self.__translators[translator_name.lower()] = _Translator()
 
+    def get_available_translator_services(self):
+        return tuple(sorted(self.__translators.iterkeys()))
+
     def _get_translator(self, service):
 
         _service = service.strip().lower()
@@ -37,6 +40,10 @@ class Translator(object):
     def get_lang_name(self, service, data):
         translator = self._get_translator(service)
         return translator.get_lang_name(data)
+
+    def get_all_lang_codes(self, service):
+        translator = self._get_translator(service)
+        return translator.get_all_lang_codes()
 
     def backup_database(self, service):
         translator = self._get_translator(service)

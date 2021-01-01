@@ -18,7 +18,6 @@ init -9 python in _translator3000:
 
             self.__json_answer = None
             self.__lock = threading.Lock()
-            self.__ui_lock = threading.Lock()
 
             self.__need_init_process = True
             self._download_process = None
@@ -40,76 +39,9 @@ init -9 python in _translator3000:
                     raise ex
                 self._download_process = None
 
-        def _overlay_callable(self):
-
-            with self.__ui_lock:
-
-                if self.__need_init_process:
-                    self.init_download_process()
-
-                if self._download_process:
-
-                    ui.vbox()
-
-                    if self._download_process.is_running():
-                        # Процесс запущен.
-
-                        self._translator._ui_text(
-                            __("Загружено {0:.2f}Мб из {1:.2f}.").format(
-                                self._download_process.current_size,
-                                self._download_process.total_size
-                            )
-                        )
-                        self._translator._ui_text(
-                            __("{0:.2f} Мбит/сек").format(
-                                self._download_process.speed
-                            )
-                        )
-                        ui.bar(1., self._download_process.status, xmaximum=200)
-
-                    elif self._download_process.is_over():
-                        # Процесс окончен.
-
-                        if self._download_process.is_successful():
-                            self._translator._ui_text(
-                                __("Загрузка окончена. Перезапустите игру.")
-                            )
-                        else:
-                            if DEBUG:
-                                self._download_process._raise_from_thread()
-                            self._translator._ui_text(__("Произошла ошибка."))
-
-                        self._translator._ui_textbutton(
-                            __("Закрыть окно."),
-                            clicked=Function(self._hide_ui)
-                        )
-
-                    else:
-                        # Процесс ещё не начинался.
-                        _text = __(
-                            (
-                                "На GitHub доступно обновление переводчика.\n"
-                                "Версия {0[0]}.{0[1]}.{0[2]} "
-                                "(текущая {1[0]}.{1[1]}.{1[2]}).\n"
-                                "Размер {2:.2f}Мб."
-                            )
-                        ).format(
-                            self.version,
-                            VERSION,
-                            self._download_process._b_to_mb(self.size)
-                        )
-                        self._translator._ui_text(_text)
-                        self._translator._ui_textbutton(
-                            __("Начать загрузку."),
-                            clicked=Function(self._download_process.start)
-                        )
-
-                    ui.close()
-
         def _hide_ui(self):
-            with self.__ui_lock:
-                self.__need_init_process = False
-                self._download_process = None
+            self.__need_init_process = False
+            self._download_process = None
 
         def is_need_update(self):
             return (self.version > VERSION)
@@ -258,6 +190,7 @@ init -9 python in _translator3000:
                 _stream = requests.get(self.__url, stream=True)
                 try:
                     self.__total_size = int(_stream.headers["Content-Length"])
+                    renpy.restart_interaction()
                     with open(temp_fn, "wb") as _write_file:
                         data_number = 0
                         last_timestamp = time.time()

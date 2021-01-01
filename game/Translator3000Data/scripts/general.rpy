@@ -9,6 +9,7 @@ init -7 python in _translator3000:
         _user_setting_file = path.abspath(
             path.join(config.basedir, "_translator3000_setting.json")
         )
+        _renpy_folder = "translator3000_ingame_files"
 
         DEFAULT_SETTING = {
             "gameLanguage": None,
@@ -28,15 +29,24 @@ init -7 python in _translator3000:
 
         def __init__(self):
 
+            self._gui = store._translator3000_gui.GUI(_translator_object=self)
+            self._translator_switcher = True
+
             self._setting = {}
             if path.isfile(self._user_setting_file):
                 with open(self._user_setting_file, "rb") as _file:
                     try:
                         _setting = json.load(_file)
                     except ValueError:
-                        raise Exception(__("Ошибка при чтении настроек."))
+                        error_message = (
+                            "Возникла ошибка при попытке чтения настроек. "
+                            "Перепроверьте введённые данные "
+                            "(запятые, кавычки у текстовых значений, "
+                            "отстутствие закрывающих токенов - '}', ']' и т.д."
+                        )
+                        raise Exception(self._gui.translate(error_message))
                     else:
-                        self._setting = _setting.copy()
+                        self._setting = copy.deepcopy(_setting)
 
             _need_dump = self._dict_multisetdefault(
                 self._setting,
@@ -56,47 +66,49 @@ init -7 python in _translator3000:
 
             _tr_object = cls()
 
-            if _tr_object._setting["_debug_mode"]:
-                store._translator3000.DEBUG = True
-                parent_logger.setLevel(logging.DEBUG)
+            _tr_object._check_setting()
 
-            if _tr_object._setting["requestsFrequency"] is not None:
-                _frq = float(_tr_object._setting["requestsFrequency"])
-                current_session.RPM = _frq
+            if renpy.game.context().init_phase:
+                renpy.game.post_init.append(
+                    _tr_object._translate_preparer.start
+                )
+            else:
+                _tr_object._translate_preparer.start()
 
             if _tr_object._setting["prescan"]:
-
-                if renpy.game.context().init_phase:
-                    renpy.game.post_init.append(
-                        _tr_object._translate_preparer.start
-                    )
-                else:
-                    _tr_object._translate_preparer.start()
+                _tr_object._translate_preparer._switcher = True
+                _tr_object._gui.show = True
 
             config.say_menu_text_filter = _tr_object
-            config.overlay_functions.append(_tr_object._overlay_callable)
             config.history_callbacks.append(_tr_object._history_callback)
 
-        def _overlay_callable(self):
-            ui.vbox(anchor=(.0, .0), pos=(.01, .01))
-            if self._setting["prescan"]:
-                self._translate_preparer._overlay_callable()
-            self._github_checker._overlay_callable()
-            ui.close()
+            setattr(store, "translator3000", _tr_object)
+            config.overlay_screens.append("translator3000_gui")
 
-        @staticmethod
-        def _ui_text(text):
-            return ui.text(text, color="#fff", outlines=[(2, "#000", 0, 0)])
+            _tr_object._github_checker.init_download_process()
+            if _tr_object._github_checker._download_process:
+                _tr_object._gui.show = True
 
-        @staticmethod
-        def _ui_textbutton(text, clicked):
-            return ui.textbutton(
-                text,
-                clicked=clicked,
-                text_color="#fff",
-                text_hover_color="#888",
-                text_outlines=[(2, "#000", 0, 0)]
+        def _check_setting(self):
+
+            """
+            Проверяет настройки, оказывающие влияние
+            на значения из внешней области
+            и применяет изменения в необходимых местах.
+            """
+
+            # _debug_mode
+            store._translator3000.DEBUG = self._setting["_debug_mode"]
+            parent_logger.setLevel(
+                (logging.DEBUG if DEBUG else logging.CRITICAL)
             )
+
+            # requestsFrequency
+            if self._setting["requestsFrequency"] is None:
+                _frq = current_session.__class__.RPM
+            else:
+                _frq = self._setting["requestsFrequency"]
+            current_session.RPM = float(_frq)
 
         @classmethod
         def _dict_multisetdefault(cls, dct, default):
@@ -128,7 +140,11 @@ init -7 python in _translator3000:
             Непосредственно - метод перевода.
             """
 
+            _force = extra_kwargs.pop("_force", False)
             _write_in_origin = extra_kwargs.pop("_write_in_origin", True)
+
+            if not (_force or self._translator_switcher):
+                return self._apply_enabled_text_tags(text)
 
             try:
 
@@ -148,18 +164,7 @@ init -7 python in _translator3000:
                 return text
 
             result = self.quote(result)
-
-            for _tag in ("font", "size"):
-                if self._setting["extraTextOptions"][_tag] is not None:
-                    result = self._add_text_tag(
-                        result,
-                        _tag,
-                        self._setting["extraTextOptions"][_tag]
-                    )
-            if self._setting["extraTextOptions"]["bold"]:
-                result = self._add_text_tag(result, 'b')
-            if self._setting["extraTextOptions"]["italic"]:
-                result = self._add_text_tag(result, 'i')
+            result = self._apply_enabled_text_tags(result)
 
             if _write_in_origin:
                 self._original_mapping[result] = text
@@ -188,6 +193,28 @@ init -7 python in _translator3000:
         def backup_database(self):
             _service = self._setting["translationService"]
             return self._translator_object.backup_database(_service)
+
+        def get_all_lang_codes(self):
+            """
+            Возвращает генератор доступных направлений,
+            для текущего сервиса перевода.
+            """
+            _service = self._setting["translationService"]
+            return self._translator_object.get_all_lang_codes(_service)
+
+        def _apply_enabled_text_tags(self, text):
+            for _tag in ("font", "size"):
+                if self._setting["extraTextOptions"][_tag] is not None:
+                    text = self._add_text_tag(
+                        text,
+                        _tag,
+                        self._setting["extraTextOptions"][_tag]
+                    )
+            if self._setting["extraTextOptions"]["bold"]:
+                text = self._add_text_tag(text, 'b')
+            if self._setting["extraTextOptions"]["italic"]:
+                text = self._add_text_tag(text, 'i')
+            return text
 
         @staticmethod
         def _add_text_tag(text, tag, value=None):

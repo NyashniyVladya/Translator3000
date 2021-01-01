@@ -1,5 +1,5 @@
 ﻿
-init -100 python in _compile_build_init:
+init -500 python in _compile_build_init:
 
     from store import config
 
@@ -19,7 +19,7 @@ init 1 python in _compile_build_init:
         raise Exception(__("Версии сборки и проекта не равны."))
 
 label start:
-
+    scene expression "#888"
     while True:
         menu:
             "Собрать билду.":

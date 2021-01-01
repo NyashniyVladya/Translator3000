@@ -12,7 +12,7 @@ from . import utils
 class TranslatorAbstract(object):
 
     __author__ = "Vladya"
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     LOGGER = None
     DATABASE_FN = None
@@ -66,4 +66,7 @@ class TranslatorAbstract(object):
         raise NotImplementedError("Should be redefined.")
 
     def get_lang_name(self, data):
+        raise NotImplementedError("Should be redefined.")
+
+    def get_all_lang_codes(self):
         raise NotImplementedError("Should be redefined.")

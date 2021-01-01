@@ -116,11 +116,11 @@ translate english strings:
 
     # game/screens.rpy:731
     old "Язык"
-    new "Язык"
+    new "Language"
 
     # game/screens.rpy:732
     old "Русский"
-    new "Русский"
+    new "Russian"
 
     # game/screens.rpy:740
     old "Режим экрана"

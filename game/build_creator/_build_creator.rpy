@@ -149,10 +149,15 @@ init 10 python in _build_creator:
                 exts=(".rpyc",)
             ),
             PackingData(
-                renpy_name="tl/compileEngNone/Translator3000Data/scripts",
-                pack_name="tl/None/Translator3000Scripts",
+                renpy_name="Translator3000Data/ingame_gui",
+                pack_name="Translator3000GUIScripts",
                 _type="folder",
                 exts=(".rpyc",)
+            ),
+            PackingData(
+                renpy_name="tl/english/000translate_trigger.rpyc",
+                pack_name="tl/english/translator3000_gui_tl.rpyc",
+                _type="file"
             )
         )
 
