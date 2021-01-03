@@ -12,7 +12,8 @@ init -98:
         $ back_action = (_actions + (translator3000._gui.BackAction(),))
 
         showif translator3000._gui.show:
-            key "game_menu" action back_action
+            if renpy.context()._menu:
+                key "game_menu" action back_action
             window:
                 hbox:
                     box_reverse True
@@ -80,12 +81,9 @@ init -98:
         $ quote = translator3000.quote
 
         use translator3000_base_vbox_in_window:
-            style_prefix "radio"
-            label _t("Язык интерфейса (не перевода)."):
-                text_style "translator3000_label_text"
+            label _t("Язык интерфейса (не перевода).")
             for t in sorted(translator3000._gui.available_languages):
                 textbutton quote(t).title():
-                    text_style "translator3000_button_text"
                     action SetField(translator3000._gui, "gui_language", t)
 
     screen translator3000_set_language(field_name):
@@ -101,14 +99,11 @@ init -98:
         $ service = translator3000._setting["translationService"]
 
         use translator3000_base_vbox_in_window:
-            style_prefix "radio"
-            label _t("Выбор языка."):
-                text_style "translator3000_label_text"
+            label _t("Выбор языка.")
             for code in sorted(translator3000.get_all_lang_codes()):
                 textbutton quote(
                     py_translator.get_lang_name(service, code)
                 ).title():
-                    text_style "translator3000_button_text"
                     action (
                         SetDict(translator3000._setting, field_name, code),
                         translator3000._gui.ApplySettingAction(True)
@@ -222,15 +217,12 @@ init -98:
         use translator3000_base_vbox_in_window:
             label _t("Настройки отображаемого текста.")
             vbox:
-                style_prefix "check"
                 textbutton _t("Курсивный текст."):
-                    text_style "translator3000_button_text"
                     action (
                         ToggleDict(text_setting, "italic"),
                         _gui.ApplySettingAction()
                     )
                 textbutton _t("Жирный текст."):
-                    text_style "translator3000_button_text"
                     action (
                         ToggleDict(text_setting, "bold"),
                         _gui.ApplySettingAction()
@@ -243,12 +235,10 @@ init -98:
                     text "{size}".format(**text_setting):
                         size 30
                 vbox:
-                    style_prefix "check"
                     for _mod in "+-":
                         $ _false = unicode(_gui._text_size_without_mod)
                         $ _true = "{0}{1}".format(_mod, _false)
                         textbutton _mod:
-                            text_style "translator3000_button_text"
                             text_size 30
                             action (
                                 ToggleDict(
@@ -275,6 +265,11 @@ init -98:
                         _fs_object.get_clear_filename(text_setting["font"])
                     ):
                         size 30
+                    textbutton _t("Сбросить."):
+                        action (
+                            SetDict(text_setting, "font", None),
+                            _gui.ApplySettingAction()
+                        )
                 textbutton _t("Выбрать из файлов игры."):
                     action _gui.ForwardAction(
                         "translator3000_set_font",
@@ -330,36 +325,28 @@ init -98:
                         )
 
             vbox:
-                style_prefix "check"
-                label _t("Булевые параметры."):
-                    text_style "translator3000_label_text"
+                label _t("Булевые параметры.")
                 textbutton _t("Предварительное сканирование при запуске."):
-                    text_style "translator3000_button_text"
                     action (
                         ToggleDict(_setting, "prescan"),
                         translator3000._gui.ApplySettingAction()
                     )
                 textbutton _t("Режим отладки."):
-                    text_style "translator3000_button_text"
                     action (
                         ToggleDict(_setting, "_debug_mode"),
                         translator3000._gui.ApplySettingAction()
                     )
                 textbutton _t("Сохранять оригинал в истории."):
-                    text_style "translator3000_button_text"
                     action (
                         ToggleDict(_setting, "originalInHistory"),
                         translator3000._gui.ApplySettingAction()
                     )
 
             vbox:
-                style_prefix "radio"
-                label _t("Сервис перевода."):
-                    text_style "translator3000_label_text"
+                label _t("Сервис перевода.")
                 $ services = py_translator.get_available_translator_services()
                 for srv in services:
                     textbutton quote(srv.title()):
-                        text_style "translator3000_button_text"
                         action (
                             SetDict(_setting, "translationService", srv),
                             translator3000._gui.ApplySettingAction(True)

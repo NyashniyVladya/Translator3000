@@ -41,6 +41,7 @@ init -99:
     style translator3000_button_text is translator3000_text:
         color "#ddd"
         hover_color "#888"
+        selected_outlines [(2, "#000", 0, 0), (1, "#050", 0, 0)]
 
     transform translator3000_general_window:
         on appear:

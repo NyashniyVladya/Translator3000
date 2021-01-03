@@ -181,46 +181,50 @@ translate english strings:
     new "Debug mode."
 
     # game/000translate_trigger.rpy:50
+    old "Сбросить."
+    new "Reset."
+
+    # game/000translate_trigger.rpy:51
     old "Сделать бэкап БД."
     new "Save database to hard drive."
 
-    # game/000translate_trigger.rpy:51
+    # game/000translate_trigger.rpy:52
     old "Сервис перевода."
     new "Translation service."
 
-    # game/000translate_trigger.rpy:52
+    # game/000translate_trigger.rpy:53
     old "Скрыть уведомление."
     new "Hide Notification."
 
-    # game/000translate_trigger.rpy:53
+    # game/000translate_trigger.rpy:54
     old "Сменить."
     new "Change."
 
-    # game/000translate_trigger.rpy:54
+    # game/000translate_trigger.rpy:55
     old "Сохранить."
     new "Save."
 
-    # game/000translate_trigger.rpy:55
+    # game/000translate_trigger.rpy:56
     old "Сохранять оригинал в истории."
     new "Save the original text in the history."
 
-    # game/000translate_trigger.rpy:56
+    # game/000translate_trigger.rpy:57
     old "Съешь же ещё этих мягких французских булок да выпей чаю.\nThe quick brown fox jumps over the lazy dog.\n(1 + 2) - 3 = (45 / 6789) * 0"
     new "The quick brown fox jumps over the lazy dog.\n(1 + 2) - 3 = (45 / 6789) * 0"
 
-    # game/000translate_trigger.rpy:57
+    # game/000translate_trigger.rpy:58
     old "Файл шрифта не найден."
     new "No font file was found."
 
-    # game/000translate_trigger.rpy:58
+    # game/000translate_trigger.rpy:59
     old "Частота запросов."
     new "Frequency of requests."
 
-    # game/000translate_trigger.rpy:59
+    # game/000translate_trigger.rpy:60
     old "Шрифт."
     new "Font."
 
-    # game/000translate_trigger.rpy:60
+    # game/000translate_trigger.rpy:61
     old "Язык интерфейса (не перевода)."
     new "Interface language (not the translation language)."
 

@@ -128,16 +128,18 @@ dmypy.json
 # RenPy files
 *.rpyc
 *.rpymc
-game/cache/*
-game/saves/*
-tmp/*
+game/cache/
+game/saves/
+tmp/
 log.txt
 errors.txt
 traceback.txt
 
 #Extra files.
 _translator3000Data/
+game/translator3000_ingame_files
 _translator3000_setting.json
 Translator3000.rpa
-_git_release_description.md
+game/Translator3000.rpa
 game/Translator3000.rpa.tmp
+_git_release_description.md
