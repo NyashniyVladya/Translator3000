@@ -162,44 +162,58 @@ init -98:
                 ):
                     size 30
 
-            if current_dir:
-                text current_dir
-                textbutton _t("Перейти в предыдущую директорию."):
-                    action SetScreenVariable(
-                        "current_dir",
-                        _fs_object.dirname(current_dir, from_game)
-                    )
+            if from_game == "from_database":
+            
+                for fnt in reversed(
+                    tuple(translator3000._multi_persistent.fonts.iterkeys())
+                ):
+                    textbutton quote(_fs_object.get_clear_filename(fnt)):
+                        action Function(
+                            _gui._set_font_pref,
+                            fnt,
+                            from_renpy="from_database"
+                        )
+            
+            else:
 
-            null height 30
-            vbox:
-                $ data_in_dir = _fs_object.listdir(current_dir, from_game)
-                for _directory in data_in_dir["dirs"]:
-                    $ full_path = _fs_object.join(
-                        current_dir,
-                        _directory,
-                        from_renpy=from_game
-                    )
-                    textbutton _t("Перейти в \"{0}\".").format(
-                        quote(_directory)
-                    ):
-                        action SetScreenVariable("current_dir", full_path)
-                null height 10
-                for _filename in data_in_dir["files"]:
-                    $ full_path = _fs_object.join(
-                        current_dir,
-                        _filename,
-                        from_renpy=from_game
-                    )
-                    $ ext = _translator3000_gui.path.splitext(full_path)[-1]
-                    if ext.lower() in _fs_object.available_font_exts:
-                        textbutton quote(
-                            _fs_object.get_clear_filename(_filename)
+                if current_dir:
+                    text current_dir
+                    textbutton _t("Перейти в предыдущую директорию."):
+                        action SetScreenVariable(
+                            "current_dir",
+                            _fs_object.dirname(current_dir, from_game)
+                        )
+
+                null height 30
+                vbox:
+                    $ data_in_dir = _fs_object.listdir(current_dir, from_game)
+                    for _directory in data_in_dir["dirs"]:
+                        $ full_path = _fs_object.join(
+                            current_dir,
+                            _directory,
+                            from_renpy=from_game
+                        )
+                        textbutton _t("Перейти в \"{0}\".").format(
+                            quote(_directory)
                         ):
-                            action Function(
-                                _gui._set_font_pref,
-                                full_path,
-                                from_renpy=from_game
-                            )
+                            action SetScreenVariable("current_dir", full_path)
+                    null height 10
+                    for _filename in data_in_dir["files"]:
+                        $ full_path = _fs_object.join(
+                            current_dir,
+                            _filename,
+                            from_renpy=from_game
+                        )
+                        $ ext = _translator3000_gui.path.splitext(full_path)[1]
+                        if ext.lower() in _fs_object.available_font_exts:
+                            textbutton quote(
+                                _fs_object.get_clear_filename(_filename)
+                            ):
+                                action Function(
+                                    _gui._set_font_pref,
+                                    full_path,
+                                    from_renpy=from_game
+                                )
 
     screen translator3000_extra_text_preferences:
 
@@ -279,6 +293,11 @@ init -98:
                     action _gui.ForwardAction(
                         "translator3000_set_font",
                         from_game=False
+                    )
+                textbutton _t("Выбрать из использовавшихся ранее."):
+                    action _gui.ForwardAction(
+                        "translator3000_set_font",
+                        from_game="from_database"
                     )
 
     screen translator3000_user_preferences:

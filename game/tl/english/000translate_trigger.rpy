@@ -209,7 +209,7 @@ translate english strings:
     new "Save the original text in the history."
 
     # game/000translate_trigger.rpy:57
-    old "Съешь же ещё этих мягких французских булок да выпей чаю.\nThe quick brown fox jumps over the lazy dog.\n(1 + 2) - 3 = (45 / 6789) * 0"
+    old "Съешь же ещё этих мягких французских булок, да выпей чаю.\nThe quick brown fox jumps over the lazy dog.\n(1 + 2) - 3 = (45 / 6789) * 0"
     new "The quick brown fox jumps over the lazy dog.\n(1 + 2) - 3 = (45 / 6789) * 0"
 
     # game/000translate_trigger.rpy:58
@@ -227,4 +227,12 @@ translate english strings:
     # game/000translate_trigger.rpy:61
     old "Язык интерфейса (не перевода)."
     new "Interface language (not the translation language)."
+
+# TODO: Translation updated at 2021-01-06 11:03
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:16
+    old "Выбрать из использовавшихся ранее."
+    new "Pick from the previously used ones."
 

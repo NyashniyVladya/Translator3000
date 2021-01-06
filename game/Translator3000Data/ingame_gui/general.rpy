@@ -21,6 +21,26 @@ init -97 python in _translator3000_gui:
                 raise TypeError(self.translate("Путь должен быть строкой."))
             return renpy.fsdecode(name)
 
+        @classmethod
+        def is_same_files(cls, descriptor1, descriptor2):
+
+            hash1 = hashlib.md5()
+            hash2 = hashlib.md5()
+            for _hash, _descriptor in (
+                (hash1, descriptor1),
+                (hash2, descriptor2)
+            ):
+                _descriptor.seek(0)
+                while True:
+                    chunk = _descriptor.read((2 ** 10))
+                    if not chunk:
+                        break
+                    _hash.update(chunk)
+            
+            if hash1.hexdigest() == hash2.hexdigest():
+                return True
+            return False
+
         @staticmethod
         def get_windows_mountdrive():
             for mount in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
@@ -99,7 +119,7 @@ init -97 python in _translator3000_gui:
             """
             Возвращает имя файла без расширения и директорий.
             """
-            filename = path.normpath(cls._unicode_path(filename))
+            filename = cls._normpath(filename)
             filename = path.basename(filename)
             if delete_ext:
                 filename, _ext = path.splitext(filename)
@@ -111,18 +131,18 @@ init -97 python in _translator3000_gui:
 
         available_languages = frozenset(("russian", "english"))
 
-        def __init__(self, _translator_object):
+        def __init__(self, translator):
 
-            self._translator_object = _translator_object
+            self._translator = translator
             self._fs_object = FileSystemWrapper()
             self._current_menu_stack = []
 
-            _sample_text = (
+            self._original_sample_text = (
                 "Съешь же ещё этих мягких французских булок, да выпей чаю.\n"
                 "The quick brown fox jumps over the lazy dog.\n"
                 "(1 + 2) - 3 = (45 / 6789) * 0"
             )
-            self._sample_text = self.translate(_sample_text)
+            self._sample_text = self.translate(self._original_sample_text)
 
         def _back(self):
 
@@ -162,7 +182,7 @@ init -97 python in _translator3000_gui:
             )
 
         def ApplySettingAction(self, restart_prescan_thread=False):
-            translator = self._translator_object
+            translator = self._translator
             funcs = [translator._dump_setting, translator._check_setting]
             if restart_prescan_thread:
                 funcs.append(translator._translate_preparer.restart)
@@ -174,6 +194,8 @@ init -97 python in _translator3000_gui:
             filename = self._fs_object._normpath(
                 renpy_path_to_font
             ).replace("\\", '/')
+            if not renpy.loadable(filename):
+                return False
             try:
                 txt = store.Text("Test", font=filename)
                 txt.render(
@@ -197,14 +219,24 @@ init -97 python in _translator3000_gui:
                 Если True, путь будет интерпретирован, как ренпаевский.
                 Если False, шрифт будет скопирован в папку в директории ренпая
                 и установлен.
+                Если "from_database" будет установлено значение из базы данных.
             """
 
-            font = path.normpath(self._fs_object._unicode_path(font))
+            font = self._fs_object._normpath(font)
+            if not font.strip():
+                raise ValueError(self.translate("Файл шрифта не найден."))
+
             if from_renpy:
                 font = font.replace("\\", '/')
-                if not self.is_correct_font(font):
-                    return
-                set_dict = self._translator_object._setting["extraTextOptions"]
+                if from_renpy == "from_database":
+                    m_pers = self._translator._multi_persistent
+                    m_pers.fonts[font] = m_pers.fonts.pop(font)
+                    m_pers.save()
+                else:
+                    if not self.is_correct_font(font):
+                        return
+                    self._translator.add_font_to_database(font)
+                set_dict = self._translator._setting["extraTextOptions"]
                 set_dict["font"] = font
                 return renpy.run(self.ApplySettingAction())
 
@@ -223,19 +255,27 @@ init -97 python in _translator3000_gui:
                 out_fn = path.abspath(
                     path.join(
                         renpy.config.gamedir,
-                        self._translator_object._renpy_folder,
+                        self._translator._renpy_folder,
+                        "pc_fonts",
                         filename
                     )
                 )
                 if not path.exists(out_fn):
                     break
+                if path.isfile(out_fn):
+                    # Если файл существует, проверяем тот же ли это файл,
+                    # сравнивая хэш.
+                    with open(font, "rb") as _f1:
+                        with open(out_fn, "rb") as _f2:
+                            if self._fs_object.is_same_files(_f1, _f2):
+                                break
                 _counter += 1
 
             with open(font, "rb") as _font_file:
                 _translator3000.utils.save_data_to_file(_font_file, out_fn)
 
             renpy_fn = path.relpath(out_fn, renpy.config.gamedir)
-            renpy_fn = path.normpath(renpy_fn).replace("\\", '/')
+            renpy_fn = self._fs_object._normpath(renpy_fn).replace("\\", '/')
 
             return self._set_font_pref(renpy_fn, from_renpy=True)
 
@@ -257,7 +297,7 @@ init -97 python in _translator3000_gui:
 
         @property
         def _text_size_pref(self):
-            size = self._translator_object._setting["extraTextOptions"]["size"]
+            size = self._translator._setting["extraTextOptions"]["size"]
             if size is None:
                 size = "+0"
             value, mod = self.parse_size_format(size)
@@ -266,7 +306,7 @@ init -97 python in _translator3000_gui:
         @_text_size_pref.setter
         def _text_size_pref(self, new_size):
             value, mod = self.parse_size_format(new_size)
-            self._translator_object._setting["extraTextOptions"]["size"] = (
+            self._translator._setting["extraTextOptions"]["size"] = (
                 "{0}{1}".format(mod, value)
             )
             renpy.run(self.ApplySettingAction())
@@ -282,7 +322,7 @@ init -97 python in _translator3000_gui:
 
         @property
         def requests_frequency_pref(self):
-            frq = self._translator_object._setting["requestsFrequency"]
+            frq = self._translator._setting["requestsFrequency"]
             if frq is None:
                 frq = _translator3000.current_session.__class__.RPM
             return float(frq)
@@ -290,7 +330,7 @@ init -97 python in _translator3000_gui:
         @requests_frequency_pref.setter
         def requests_frequency_pref(self, new_freq):
             new_freq = float(new_freq)
-            self._translator_object._setting["requestsFrequency"] = new_freq
+            self._translator._setting["requestsFrequency"] = new_freq
             renpy.run(self.ApplySettingAction())
 
         @property
@@ -308,6 +348,7 @@ init -97 python in _translator3000_gui:
             if new_language != self.gui_language:
                 name = self.get_persistent_name("gui_language")
                 setattr(persistent, name, new_language)
+                self._sample_text = self.translate(self._original_sample_text)
 
         @property
         def show(self):

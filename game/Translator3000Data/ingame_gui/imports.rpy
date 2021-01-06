@@ -2,6 +2,7 @@
 init -100 python in _translator3000_gui:
 
     import os
+    import hashlib
     import store
     import _translator3000
     from os import path

@@ -12,6 +12,7 @@ init -10 python in _translator3000:
     import requests
     import threading
     import json
+    import collections
     import store
     from os import path
     from requests.packages import urllib3
@@ -28,7 +29,7 @@ init -10 python in _translator3000:
         utils
     )
 
-    VERSION = (2, 5, 1)
+    VERSION = (2, 5, 2)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))

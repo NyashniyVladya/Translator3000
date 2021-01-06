@@ -10,7 +10,21 @@ init -7 python in _translator3000:
             path.join(config.basedir, "_translator3000_setting.json")
         )
         _renpy_folder = "translator3000_ingame_files"
+        multigame_fonts_folder = path.abspath(
+            path.join(config.gamedir, _renpy_folder, "multigame_fonts")
+        )
+        
+        _multi_persistent = store.MultiPersistent("translator3000_data")
 
+        MULTIGAME_KEYS = (
+            # Настройки, сохраняющиеся в системе и включающиеся по умолчанию
+            # в других играх.
+            "gameLanguage",
+            "directionOfTranslation",
+            "translationService",
+            "originalInHistory",
+            "extraTextOptions"
+        )
         DEFAULT_SETTING = {
             "gameLanguage": None,
             "directionOfTranslation": None,
@@ -29,8 +43,14 @@ init -7 python in _translator3000:
 
         def __init__(self):
 
-            self._gui = store._translator3000_gui.GUI(_translator_object=self)
+            self._gui = store._translator3000_gui.GUI(translator=self)
             self._translator_switcher = True
+
+            if self._multi_persistent.setting is None:
+                self._multi_persistent.setting = {}
+            if self._multi_persistent.fonts is None:
+                self._multi_persistent.fonts = collections.OrderedDict()
+            self._multi_persistent.save()
 
             self._setting = {}
             if path.isfile(self._user_setting_file):
@@ -47,19 +67,25 @@ init -7 python in _translator3000:
                         raise Exception(self._gui.translate(error_message))
                     else:
                         self._setting = copy.deepcopy(_setting)
-
-            _need_dump = self._dict_multisetdefault(
-                self._setting,
-                self.DEFAULT_SETTING
-            )
-            if _need_dump:
-                self._dump_setting()
+            
+            # Сначала проверяем настройки пользователя для конкретной игры,
+            # потом сохранённые настройки для всех игр,
+            # потом ставим дефолтные.
+            for d in (self._multi_persistent.setting, self.DEFAULT_SETTING):
+                self._dict_multisetdefault(self._setting, d)
+            utils.remove_dir(self.multigame_fonts_folder)
+            if self._setting["extraTextOptions"]["font"] is not None:
+                _fnt = self._setting["extraTextOptions"]["font"]
+                if renpy.loadable(_fnt):
+                    self.add_font_to_database(_fnt)
+            self._dump_setting()
 
             self._original_mapping = {}
 
             self._translator_object = translator.Translator()
             self._translate_preparer = Preparer(translator_object=self)
             self._github_checker = GitChecker(translator_object=self)
+            
 
         @classmethod
         def turn_on(cls):
@@ -88,6 +114,60 @@ init -7 python in _translator3000:
             _tr_object._github_checker.init_download_process()
             if _tr_object._github_checker._download_process:
                 _tr_object._gui.show = True
+
+        def add_font_to_database(self, font):
+        
+            font = self._gui._fs_object._normpath(font)
+            if not font.strip():
+                raise ValueError(self._gui.translate("Файл шрифта не найден."))
+
+            font = font.replace("\\", '/')
+            
+            result = b""
+            with renpy.file(font) as _font_file:
+                while True:
+                    chunk = _font_file.read((2 ** 10))
+                    if not chunk:
+                        break
+                    result += chunk
+
+            # Для смещения в очереди.
+            self._multi_persistent.fonts.pop(font, None)
+            self._multi_persistent.fonts[font] = result
+            self._multi_persistent.save()
+
+        def get_font(self, font):
+        
+            """
+            Последовательно ищет шрифт в следующем порядке:
+                Сначала проверяется конкретный переданный путь,
+                если нет - проверяется наличие в базе данных.
+                Если и тут неудача - бросается исключение.
+            """
+            
+            font = self._gui._fs_object._normpath(font)
+            if not font.strip():
+                raise ValueError(self._gui.translate("Файл шрифта не найден."))
+                
+            font = font_name = font.replace("\\", '/')
+            
+            if renpy.loadable(font):
+                return font
+                
+            out_fn = path.abspath(path.join(self.multigame_fonts_folder, font))
+            font = self._gui._fs_object._normpath(
+                path.relpath(out_fn, config.gamedir)
+            ).replace("\\", '/')
+
+            if renpy.loadable(font):
+                return font
+                
+            if font_name in self._multi_persistent.fonts:
+                font_bytes = self._multi_persistent.fonts[font_name]
+                utils.save_data_to_file(font_bytes, out_fn)
+                return font
+
+            raise ValueError(self._gui.translate("Файл шрифта не найден."))
 
         def _check_setting(self):
 
@@ -137,7 +217,7 @@ init -7 python in _translator3000:
         def __call__(self, text, _update_on_hdd=True, **extra_kwargs):
 
             """
-            Непосредственно - метод перевода.
+            Основной метод перевода.
             """
 
             _force = extra_kwargs.pop("_force", False)
@@ -185,10 +265,18 @@ init -7 python in _translator3000:
                 entry_object.what = entry_object.translator3000_original_what
 
         def _dump_setting(self):
+        
             _backup = json.dumps(self._setting, ensure_ascii=False, indent=4)
             if isinstance(_backup, unicode):
                 _backup = _backup.encode("utf_8")
             utils.save_data_to_file(_backup, self._user_setting_file)
+            
+            self._multi_persistent.setting.clear()
+            for k in self.MULTIGAME_KEYS:
+                v = self._setting[k]
+                if v != self.DEFAULT_SETTING[k]:
+                    self._multi_persistent.setting[k] = copy.deepcopy(v)
+            self._multi_persistent.save()
 
         def backup_database(self):
             _service = self._setting["translationService"]
@@ -203,17 +291,21 @@ init -7 python in _translator3000:
             return self._translator_object.get_all_lang_codes(_service)
 
         def _apply_enabled_text_tags(self, text):
-            for _tag in ("font", "size"):
-                if self._setting["extraTextOptions"][_tag] is not None:
-                    text = self._add_text_tag(
-                        text,
-                        _tag,
-                        self._setting["extraTextOptions"][_tag]
-                    )
+
+            if self._setting["extraTextOptions"]["font"] is not None:
+                font = self.get_font(self._setting["extraTextOptions"]["font"])
+                text = self._add_text_tag(text, "font", font)
+                
+            if self._setting["extraTextOptions"]["size"] is not None:
+                size = self._setting["extraTextOptions"]["size"]
+                text = self._add_text_tag(text, "size", size)
+
             if self._setting["extraTextOptions"]["bold"]:
                 text = self._add_text_tag(text, 'b')
+
             if self._setting["extraTextOptions"]["italic"]:
                 text = self._add_text_tag(text, 'i')
+
             return text
 
         @staticmethod
