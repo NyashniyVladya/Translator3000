@@ -36,7 +36,7 @@ init -97 python in _translator3000_gui:
                     if not chunk:
                         break
                     _hash.update(chunk)
-            
+
             if hash1.hexdigest() == hash2.hexdigest():
                 return True
             return False
@@ -228,6 +228,7 @@ init -97 python in _translator3000_gui:
 
             if from_renpy:
                 font = font.replace("\\", '/')
+                renpy.loader.loadable_cache.pop(font, None)
                 if from_renpy == "from_database":
                     m_pers = self._translator._multi_persistent
                     m_pers.fonts[font] = m_pers.fonts.pop(font)

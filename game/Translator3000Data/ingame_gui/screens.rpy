@@ -163,7 +163,7 @@ init -98:
                     size 30
 
             if from_game == "from_database":
-            
+
                 for fnt in reversed(
                     tuple(translator3000._multi_persistent.fonts.iterkeys())
                 ):
@@ -173,7 +173,7 @@ init -98:
                             fnt,
                             from_renpy="from_database"
                         )
-            
+
             else:
 
                 if current_dir:

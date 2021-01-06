@@ -13,7 +13,7 @@ init -7 python in _translator3000:
         multigame_fonts_folder = path.abspath(
             path.join(config.gamedir, _renpy_folder, "multigame_fonts")
         )
-        
+
         _multi_persistent = store.MultiPersistent("translator3000_data")
 
         MULTIGAME_KEYS = (
@@ -67,7 +67,7 @@ init -7 python in _translator3000:
                         raise Exception(self._gui.translate(error_message))
                     else:
                         self._setting = copy.deepcopy(_setting)
-            
+
             # Сначала проверяем настройки пользователя для конкретной игры,
             # потом сохранённые настройки для всех игр,
             # потом ставим дефолтные.
@@ -85,7 +85,6 @@ init -7 python in _translator3000:
             self._translator_object = translator.Translator()
             self._translate_preparer = Preparer(translator_object=self)
             self._github_checker = GitChecker(translator_object=self)
-            
 
         @classmethod
         def turn_on(cls):
@@ -116,13 +115,13 @@ init -7 python in _translator3000:
                 _tr_object._gui.show = True
 
         def add_font_to_database(self, font):
-        
+
             font = self._gui._fs_object._normpath(font)
             if not font.strip():
                 raise ValueError(self._gui.translate("Файл шрифта не найден."))
 
             font = font.replace("\\", '/')
-            
+
             result = b""
             with renpy.file(font) as _font_file:
                 while True:
@@ -137,23 +136,23 @@ init -7 python in _translator3000:
             self._multi_persistent.save()
 
         def get_font(self, font):
-        
+
             """
             Последовательно ищет шрифт в следующем порядке:
                 Сначала проверяется конкретный переданный путь,
                 если нет - проверяется наличие в базе данных.
                 Если и тут неудача - бросается исключение.
             """
-            
+
             font = self._gui._fs_object._normpath(font)
             if not font.strip():
                 raise ValueError(self._gui.translate("Файл шрифта не найден."))
-                
+
             font = font_name = font.replace("\\", '/')
-            
+
             if renpy.loadable(font):
                 return font
-                
+
             out_fn = path.abspath(path.join(self.multigame_fonts_folder, font))
             font = self._gui._fs_object._normpath(
                 path.relpath(out_fn, config.gamedir)
@@ -161,8 +160,9 @@ init -7 python in _translator3000:
 
             if renpy.loadable(font):
                 return font
-                
+
             if font_name in self._multi_persistent.fonts:
+                renpy.loader.loadable_cache.pop(font, None)
                 font_bytes = self._multi_persistent.fonts[font_name]
                 utils.save_data_to_file(font_bytes, out_fn)
                 return font
@@ -265,12 +265,12 @@ init -7 python in _translator3000:
                 entry_object.what = entry_object.translator3000_original_what
 
         def _dump_setting(self):
-        
+
             _backup = json.dumps(self._setting, ensure_ascii=False, indent=4)
             if isinstance(_backup, unicode):
                 _backup = _backup.encode("utf_8")
             utils.save_data_to_file(_backup, self._user_setting_file)
-            
+
             self._multi_persistent.setting.clear()
             for k in self.MULTIGAME_KEYS:
                 v = self._setting[k]
@@ -295,7 +295,7 @@ init -7 python in _translator3000:
             if self._setting["extraTextOptions"]["font"] is not None:
                 font = self.get_font(self._setting["extraTextOptions"]["font"])
                 text = self._add_text_tag(text, "font", font)
-                
+
             if self._setting["extraTextOptions"]["size"] is not None:
                 size = self._setting["extraTextOptions"]["size"]
                 text = self._add_text_tag(text, "size", size)
