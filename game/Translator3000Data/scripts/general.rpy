@@ -1,7 +1,7 @@
 
 init -7 python in _translator3000:
 
-    class Translator3000(NoRollback):
+    class Translator3000(SingleTone):
 
         __author__ = "Vladya"
 
@@ -42,6 +42,9 @@ init -7 python in _translator3000:
         }
 
         def __init__(self):
+
+            if self.initialized:
+                return
 
             self._gui = store._translator3000_gui.GUI(translator=self)
             self._translator_switcher = True
@@ -85,6 +88,8 @@ init -7 python in _translator3000:
             self._translator_object = translator.Translator()
             self._translate_preparer = Preparer(translator_object=self)
             self._github_checker = GitChecker(translator_object=self)
+
+            self.initialized = True
 
         @classmethod
         def turn_on(cls):

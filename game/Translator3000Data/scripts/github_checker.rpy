@@ -1,7 +1,7 @@
 
 init -9 python in _translator3000:
 
-    class GitChecker(NoRollback):
+    class GitChecker(SingleTone):
 
         __author__ = "Vladya"
 
@@ -14,6 +14,9 @@ init -9 python in _translator3000:
 
         def __init__(self, translator_object):
 
+            if self.initialized:
+                return
+
             self._translator = translator_object
 
             self.__json_answer = None
@@ -21,6 +24,8 @@ init -9 python in _translator3000:
 
             self.__need_init_process = True
             self._download_process = None
+
+            self.initialized = True
 
         def init_download_process(self):
 
@@ -97,13 +102,16 @@ init -9 python in _translator3000:
                 fragment=None
             ).url
 
-    class Downloader(threading.Thread, NoRollback):
+    class Downloader(threading.Thread, SingleTone):
 
         __author__ = "Vladya"
 
         LOGGER = LOGGER.getChild("Downloader")
 
         def __init__(self, url, out_fn):
+
+            if self.initialized:
+                return
 
             super(Downloader, self).__init__()
             self.daemon = True
@@ -129,6 +137,8 @@ init -9 python in _translator3000:
 
             # Скорость загрузки. Значение в байтах в секунду.
             self.__speed = None
+
+            self.initialized = True
 
         @staticmethod
         def _b_to_mb(value):

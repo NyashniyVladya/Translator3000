@@ -1,7 +1,7 @@
 
 init -8 python in _translator3000:
 
-    class Preparer(threading.Thread, NoRollback):
+    class Preparer(threading.Thread, SingleTone):
 
         """
         Демон для параллельного перевода всего текста в игре.
@@ -12,6 +12,9 @@ init -8 python in _translator3000:
         LOGGER = LOGGER.getChild("Preparer")
 
         def __init__(self, translator_object):
+
+            if self.initialized:
+                return
 
             super(Preparer, self).__init__()
             self.daemon = True
@@ -24,6 +27,8 @@ init -8 python in _translator3000:
 
             self._switcher = False
             self.__need_restart = True
+
+            self.initialized = True
 
         def restart(self):
             """
