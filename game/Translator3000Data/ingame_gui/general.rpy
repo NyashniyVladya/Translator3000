@@ -1,7 +1,7 @@
 
 init -97 python in _translator3000_gui:
 
-    class FileSystemWrapper(store.NoRollback):
+    class FileSystemWrapper(SingleTone):
 
         __author__ = "Vladya"
 
@@ -125,13 +125,16 @@ init -97 python in _translator3000_gui:
                 filename, _ext = path.splitext(filename)
             return filename
 
-    class GUI(store.NoRollback):
+    class GUI(SingleTone):
 
         __author__ = "Vladya"
 
         available_languages = frozenset(("russian", "english"))
 
         def __init__(self, translator):
+
+            if self.initialized:
+                return
 
             self._translator = translator
             self._fs_object = FileSystemWrapper()
@@ -143,6 +146,8 @@ init -97 python in _translator3000_gui:
                 "(1 + 2) - 3 = (45 / 6789) * 0"
             )
             self._sample_text = self.translate(self._original_sample_text)
+
+            self.initialized = True
 
         def _back(self):
 

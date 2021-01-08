@@ -17,3 +17,5 @@ init -100 python in _translator3000_gui:
         lambda x: int((float(x) * PHI_CONST)),
         (store.config.screen_width, store.config.screen_height)
     )
+
+    SingleTone = store.translator3000_preinit.SingleTone

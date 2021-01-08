@@ -29,27 +29,10 @@ init -10 python in _translator3000:
         utils
     )
 
-    VERSION = (2, 5, 5)
+    VERSION = (2, 5, 6)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))
     LOGGER = parent_logger.getChild("Ren'Py")
 
-    class SingleTone(NoRollback):
-
-        initialized = False
-        single_instance = None
-
-        def __new__(cls, *args, **kwargs):
-            if cls.single_instance is None:
-                cls.single_instance = super(SingleTone, cls).__new__(cls)
-            return cls.single_instance
-
-        def __init__(self):
-            self.initialized = True
-
-        def __getstate__(self):
-            return None
-
-        def __setstate__(self, data):
-            self.__init__()
+    SingleTone = store.translator3000_preinit.SingleTone
