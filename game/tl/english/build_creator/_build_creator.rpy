@@ -18,3 +18,11 @@ translate english strings:
     old "Сборка неудачна.\n{0}"
     new "The build failed.\n{0}"
 
+# TODO: Translation updated at 2021-01-15 00:46
+
+translate english strings:
+
+    # game/build_creator/_build_creator.rpy:191
+    old "Объект должен принадлежать классу 'PackingData'."
+    new "The object should be an instance of the 'PackingData' class."
+

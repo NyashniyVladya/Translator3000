@@ -29,7 +29,7 @@ init -10 python in _translator3000:
         utils
     )
 
-    VERSION = (2, 5, 6)
+    VERSION = (2, 5, 7)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))

@@ -50,9 +50,11 @@ init 10 python in _build_creator:
             if (self.__type == "folder") and (exts is not None):
                 self.__exts = frozenset(map(lambda x: x.strip().lower(), exts))
 
+            assert renpy_name.strip()
             self.__renpy_name = path.normpath(renpy_name).replace('\\', '/')
 
             if pack_name not in (_gamedir, _samedir):
+                assert pack_name.strip()
                 pack_name = path.normpath(pack_name).replace('\\', '/')
             self.__pack_name = pack_name
 
@@ -127,7 +129,7 @@ init 10 python in _build_creator:
     class RPACreator(archiver.Archive):
 
         __author__ = "Vladya"
-        __version__ = "2.0.0"
+        __version__ = "2.0.1"
 
         DATA_FOR_PACKING = (
             PackingData(
@@ -155,6 +157,12 @@ init 10 python in _build_creator:
                 exts=(".rpyc",)
             ),
             PackingData(
+                renpy_name="Translator3000OtherFiles",
+                pack_name=_samedir,
+                _type="folder",
+                exts=None
+            ),
+            PackingData(
                 renpy_name="tl/english/000translate_trigger.rpyc",
                 pack_name="tl/english/translator3000_gui_tl.rpyc",
                 _type="file"
@@ -170,15 +178,21 @@ init 10 python in _build_creator:
             super(RPACreator, self).__init__(_rpa_name)
 
         @classmethod
-        def create_build(cls, build_name):
+        def create_build(cls, build_name, data_for_packing=None):
             with cls(build_name) as _rpa:
-                _rpa._pack()
+                _rpa._pack(data_for_packing)
 
-        def _pack(self):
+        def _pack(self, data_for_packing=None):
             """
-            Пакует данные, указанные в 'self.DATA_FOR_PACKING'.
+            Пакует данные, указанные в 'data_for_packing'.
             """
-            for data_object in self.DATA_FOR_PACKING:
+            if data_for_packing is None:
+                data_for_packing = self.DATA_FOR_PACKING
+            for data_object in data_for_packing:
+                if not isinstance(data_object, PackingData):
+                    raise TypeError(
+                        __("Объект должен принадлежать классу 'PackingData'.")
+                    )
                 for renpy_fn, abs_fn in data_object.get_data_for_pack():
                     self.add(renpy_fn, abs_fn)
 

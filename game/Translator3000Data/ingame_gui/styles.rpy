@@ -29,6 +29,7 @@ init -99:
 
     style translator3000_text is default:
         size 25
+        font "Translator3000OtherFiles/DejaVuSans.ttf"
         color "#eee"
         outlines [(2, "#000", 0, 0)]
 
