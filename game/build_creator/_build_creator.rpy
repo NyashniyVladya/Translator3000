@@ -129,7 +129,7 @@ init 10 python in _build_creator:
     class RPACreator(archiver.Archive):
 
         __author__ = "Vladya"
-        __version__ = "2.0.1"
+        __version__ = "2.0.2"
 
         DATA_FOR_PACKING = (
             PackingData(
@@ -142,7 +142,7 @@ init 10 python in _build_creator:
                 renpy_name="Translator3000Data/third_party_python_modules",
                 pack_name=_gamedir,
                 _type="folder",
-                exts=(".pem", ".py")
+                exts=(".py",)
             ),
             PackingData(
                 renpy_name="Translator3000Data/scripts",
@@ -169,6 +169,14 @@ init 10 python in _build_creator:
             )
         )
 
+        requests_packing = PackingData(
+            renpy_name="Translator3000Data/requests_module",
+            pack_name=_gamedir,
+            _type="folder",
+            exts=(".pem", ".py")
+        )
+
+
         def __init__(self, name):
             """
             Архив будет размещён в основной директории игры (НЕ в game).
@@ -178,9 +186,17 @@ init 10 python in _build_creator:
             super(RPACreator, self).__init__(_rpa_name)
 
         @classmethod
-        def create_build(cls, build_name, data_for_packing=None):
+        def create_build(cls, build_name):
+
+            pack_data = cls.DATA_FOR_PACKING[:]
             with cls(build_name) as _rpa:
-                _rpa._pack(data_for_packing)
+                _rpa._pack(pack_data)
+
+            build_name = "{0} (for old Ren'Py versions)".format(build_name)
+            pack_data += (cls.requests_packing,)
+            with cls(build_name) as _rpa:
+                _rpa._pack(pack_data)
+
 
         def _pack(self, data_for_packing=None):
             """

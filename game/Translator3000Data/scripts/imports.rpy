@@ -15,7 +15,6 @@ init -10 python in _translator3000:
     import collections
     import store
     from os import path
-    from requests.packages import urllib3
     from store import (
         NoRollback,
         Function,
@@ -29,7 +28,12 @@ init -10 python in _translator3000:
         utils
     )
 
-    VERSION = (2, 5, 7)
+    if renpy.version(True) >= (7, 4, 0):
+        import urllib3
+    else:
+        from requests.packages import urllib3
+
+    VERSION = (2, 5, 8)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))

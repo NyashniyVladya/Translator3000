@@ -89,7 +89,10 @@ init -98:
 
         use translator3000_base_vbox_in_window:
             label translator3000._gui.translate("Выбор языка.")
-            for code in sorted(translator3000.get_all_lang_codes()):
+            for code in sorted(
+                translator3000.get_all_lang_codes(),
+                key=lambda _c: translator3000._translator_object.get_lang_name(translator3000._setting["translationService"], _c)
+            ):
                 textbutton translator3000.quote(
                     translator3000._translator_object.get_lang_name(translator3000._setting["translationService"], code)
                 ).title():
@@ -248,9 +251,8 @@ init -98:
                 if translator3000._setting["extraTextOptions"]["font"] is None:
                     text translator3000._gui.translate("Не установлено.")
                 else:
-                    $ _fs_object = translator3000._gui._fs_object
                     text translator3000.quote(
-                        _fs_object.get_clear_filename(translator3000._setting["extraTextOptions"]["font"])
+                        translator3000._gui._fs_object.get_clear_filename(translator3000._setting["extraTextOptions"]["font"])
                     ):
                         size 30
                     textbutton translator3000._gui.translate("Сбросить."):

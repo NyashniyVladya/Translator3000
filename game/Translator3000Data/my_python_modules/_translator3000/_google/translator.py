@@ -5,7 +5,6 @@
 
 import json
 from os import path
-from requests.packages import urllib3
 from .. import (
     translator_abstract,
     current_session
@@ -16,6 +15,12 @@ from . import (
     _paths,
     LOGGER
 )
+
+
+try:
+    import urllib3
+except ImportError:
+    from requests.packages import urllib3
 
 
 class Translator(translator_abstract.TranslatorAbstract):

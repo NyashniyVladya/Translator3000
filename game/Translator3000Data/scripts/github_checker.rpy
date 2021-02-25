@@ -10,7 +10,14 @@ init -9 python in _translator3000:
         OWNER = "NyashniyVladya"
         REPO = "Translator3000"
 
-        filename = "Translator3000.rpa"
+        filename_variants = (
+            "Translator3000.rpa",
+            "Translator3000 (for old Ren'Py versions).rpa"
+        )
+        if renpy.version(True) >= (7, 4, 0):
+            filename = "Translator3000.rpa"
+        else:
+            filename = "Translator3000 (for old Ren'Py versions).rpa"
 
         def __init__(self, translator_object):
 
@@ -34,9 +41,13 @@ init -9 python in _translator3000:
 
             try:
                 if self.is_need_update():
+                    delete_array = frozenset(
+                        map(self._find_file, self.filename_variants)
+                    )
                     self._download_process = Downloader(
                         self.download_link,
-                        self._get_rpa_path()
+                        self._find_file(self.filename),
+                        delete_array=delete_array
                     )
             except Exception as ex:
                 # Проблемы с интернетом.
@@ -51,15 +62,17 @@ init -9 python in _translator3000:
         def is_need_update(self):
             return (self.version > VERSION)
 
-        def _get_rpa_path(cls):
+        @staticmethod
+        def _find_file(filename):
+            filename = path.normpath(filename)
             for fn in renpy.list_files():
                 fn = path.normpath(fn)
-                if path.basename(fn) == cls.filename:
+                if path.basename(fn) == filename:
                     for _searchpath in config.searchpath:
                         full_fn = path.abspath(path.join(_searchpath, fn))
                         if path.isfile(full_fn):
                             return full_fn
-            return path.abspath(path.join(config.gamedir, cls.filename))
+            return path.abspath(path.join(config.gamedir, filename))
 
         @property
         def download_link(self):
@@ -89,7 +102,10 @@ init -9 python in _translator3000:
 
         @property
         def rpa(self):
-            return self.latest_release["assets"][0]
+            for asset in self.latest_release["assets"]:
+                if asset["name"] == self.filename:
+                    return asset.copy()
+            raise Exception("Unknown error.")
 
         def get_url(self, _path):
             return urllib3.util.Url(
@@ -108,7 +124,7 @@ init -9 python in _translator3000:
 
         LOGGER = LOGGER.getChild("Downloader")
 
-        def __init__(self, url, out_fn):
+        def __init__(self, url, out_fn, delete_array=None):
 
             if self.initialized:
                 return
@@ -127,6 +143,12 @@ init -9 python in _translator3000:
                 out_fn = out_fn.decode("utf_8")
 
             self.__out_fn = path.abspath(out_fn)
+
+            self.__delete_array = frozenset()
+            if delete_array is not None:
+                self.__delete_array = frozenset(
+                    map(path.abspath, delete_array)
+                )
 
             self.__current_size = 0
             self.__total_size = None
@@ -222,8 +244,12 @@ init -9 python in _translator3000:
                             renpy.restart_interaction()
                 finally:
                     _stream.close()
-                if path.isfile(self.__out_fn):
-                    os.remove(self.__out_fn)
+
+                delete_array = self.__delete_array.copy()
+                delete_array += frozenset((self.__out_fn,))
+                for _f in delete_array:
+                    if path.isfile(_f):
+                        os.remove(_f)
                 utils.create_dir_for_file(self.__out_fn)
                 os.rename(temp_fn, self.__out_fn)
             except Exception as ex:

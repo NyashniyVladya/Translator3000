@@ -14,7 +14,9 @@ from . import (
 )
 
 __author__ = "Vladya"
-__version__ = "1.0.4"
+__version__ = "1.0.5"
+
+RENPY_WITH_REQUESTS = (7, 4, 0)
 
 utils.remove_dir(_paths.TEMP_FOLDER)
 utils.remove_dir(_paths.DEBUG_FOLDER)
@@ -23,7 +25,7 @@ LOGGER = _logging.Logger.getLogger("translator3000")
 LOGGER.setLevel(logging.DEBUG)
 
 
-if utils.renpy:
+if utils.renpy and (utils.renpy.version(True) < RENPY_WITH_REQUESTS):
     # Get cert from .rpa
     requests.utils.DEFAULT_CA_BUNDLE_PATH = path.join(
         _paths.TEMP_FOLDER,

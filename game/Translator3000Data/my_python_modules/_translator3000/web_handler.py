@@ -7,7 +7,11 @@ import time
 import random
 import threading
 import requests
-from requests.packages import urllib3
+
+try:
+    import urllib3
+except ImportError:
+    from requests.packages import urllib3
 
 
 class HostInfo(object):

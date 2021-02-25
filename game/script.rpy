@@ -3,10 +3,14 @@ init -500 python in _compile_build_init:
 
     from store import config
 
-    for _path in (
+    _paths = (
         "Translator3000Data/third_party_python_modules/",
         "Translator3000Data/my_python_modules/"
-    ):
+    )
+    if renpy.version(True) < (7, 4, 0):
+        _paths += ("Translator3000Data/requests_module/",)
+
+    for _path in _paths:
         renpy.add_python_directory(_path)
         config.search_prefixes.append(_path)
 
