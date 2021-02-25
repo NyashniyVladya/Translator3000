@@ -129,7 +129,7 @@ init 10 python in _build_creator:
     class RPACreator(archiver.Archive):
 
         __author__ = "Vladya"
-        __version__ = "2.0.2"
+        __version__ = "2.0.3"
 
         DATA_FOR_PACKING = (
             PackingData(
@@ -192,7 +192,7 @@ init 10 python in _build_creator:
             with cls(build_name) as _rpa:
                 _rpa._pack(pack_data)
 
-            build_name = "{0} (for old Ren'Py versions)".format(build_name)
+            build_name = "{0}_for_old_versions".format(build_name)
             pack_data += (cls.requests_packing,)
             with cls(build_name) as _rpa:
                 _rpa._pack(pack_data)

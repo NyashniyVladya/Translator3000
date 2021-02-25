@@ -12,12 +12,12 @@ init -9 python in _translator3000:
 
         filename_variants = (
             "Translator3000.rpa",
-            "Translator3000 (for old Ren'Py versions).rpa"
+            "Translator3000_for_old_versions.rpa"
         )
         if renpy.version(True) >= (7, 4, 0):
             filename = "Translator3000.rpa"
         else:
-            filename = "Translator3000 (for old Ren'Py versions).rpa"
+            filename = "Translator3000_for_old_versions.rpa"
 
         def __init__(self, translator_object):
 

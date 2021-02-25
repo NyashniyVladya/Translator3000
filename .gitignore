@@ -140,7 +140,7 @@ _translator3000Data/
 game/translator3000_ingame_files
 _translator3000_setting.json
 Translator3000.rpa
+Translator3000_for_old_versions.rpa
 game/Translator3000.rpa
 game/Translator3000.rpa.tmp
 _git_release_description.md
-Translator3000 (for old Ren'Py versions).rpa
