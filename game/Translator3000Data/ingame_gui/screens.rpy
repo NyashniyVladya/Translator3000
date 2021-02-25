@@ -376,7 +376,7 @@ init -98:
                         translator3000._github_checker._download_process.current_size,
                         translator3000._github_checker._download_process.total_size
                     )
-                    text translator3000._gui.translate("{0:.2f} Мбит/сек.").format(process.speed)
+                    text translator3000._gui.translate("{0:.2f} Мбит/сек.").format(translator3000._github_checker._download_process.speed)
                     bar value StaticValue(translator3000._github_checker._download_process.status)
                 elif translator3000._github_checker._download_process.is_over():
                     # Процесс окончен.
