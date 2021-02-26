@@ -21,3 +21,7 @@ init -200 python in translator3000_preinit:
 
         def __setstate__(self, data):
             self.__init__()
+
+
+    if renpy.version(True) < (7, 4, 0):
+        renpy.config.search_prefixes.append("old_requests_module/")

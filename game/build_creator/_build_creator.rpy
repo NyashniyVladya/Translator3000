@@ -129,7 +129,7 @@ init 10 python in _build_creator:
     class RPACreator(archiver.Archive):
 
         __author__ = "Vladya"
-        __version__ = "2.0.3"
+        __version__ = "2.0.4"
 
         DATA_FOR_PACKING = (
             PackingData(
@@ -143,6 +143,12 @@ init 10 python in _build_creator:
                 pack_name=_gamedir,
                 _type="folder",
                 exts=(".py",)
+            ),
+            PackingData(
+                renpy_name="Translator3000Data/requests_module",
+                pack_name="old_requests_module",
+                _type="folder",
+                exts=(".pem", ".py")
             ),
             PackingData(
                 renpy_name="Translator3000Data/scripts",
@@ -169,13 +175,6 @@ init 10 python in _build_creator:
             )
         )
 
-        requests_packing = PackingData(
-            renpy_name="Translator3000Data/requests_module",
-            pack_name=_gamedir,
-            _type="folder",
-            exts=(".pem", ".py")
-        )
-
 
         def __init__(self, name):
             """
@@ -187,16 +186,8 @@ init 10 python in _build_creator:
 
         @classmethod
         def create_build(cls, build_name):
-
-            pack_data = cls.DATA_FOR_PACKING[:]
             with cls(build_name) as _rpa:
-                _rpa._pack(pack_data)
-
-            build_name = "{0}_for_old_versions".format(build_name)
-            pack_data += (cls.requests_packing,)
-            with cls(build_name) as _rpa:
-                _rpa._pack(pack_data)
-
+                _rpa._pack()
 
         def _pack(self, data_for_packing=None):
             """

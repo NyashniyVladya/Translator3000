@@ -10,14 +10,7 @@ init -9 python in _translator3000:
         OWNER = "NyashniyVladya"
         REPO = "Translator3000"
 
-        filename_variants = (
-            "Translator3000.rpa",
-            "Translator3000_for_old_versions.rpa"
-        )
-        if renpy.version(True) >= (7, 4, 0):
-            filename = "Translator3000.rpa"
-        else:
-            filename = "Translator3000_for_old_versions.rpa"
+        filename = "Translator3000.rpa"
 
         def __init__(self, translator_object):
 
@@ -41,13 +34,9 @@ init -9 python in _translator3000:
 
             try:
                 if self.is_need_update():
-                    delete_array = frozenset(
-                        map(self._find_file, self.filename_variants)
-                    )
                     self._download_process = Downloader(
                         self.download_link,
-                        self._find_file(self.filename),
-                        delete_array=delete_array
+                        self._find_file(self.filename)
                     )
             except Exception as ex:
                 # Проблемы с интернетом.
@@ -102,10 +91,7 @@ init -9 python in _translator3000:
 
         @property
         def rpa(self):
-            for asset in self.latest_release["assets"]:
-                if asset["name"] == self.filename:
-                    return asset.copy()
-            raise Exception("Unknown error.")
+            return self.latest_release["assets"][0].copy()
 
         def get_url(self, _path):
             return urllib3.util.Url(
@@ -124,7 +110,7 @@ init -9 python in _translator3000:
 
         LOGGER = LOGGER.getChild("Downloader")
 
-        def __init__(self, url, out_fn, delete_array=None):
+        def __init__(self, url, out_fn):
 
             if self.initialized:
                 return
@@ -143,12 +129,6 @@ init -9 python in _translator3000:
                 out_fn = out_fn.decode("utf_8")
 
             self.__out_fn = path.abspath(out_fn)
-
-            self.__delete_array = frozenset()
-            if delete_array is not None:
-                self.__delete_array = frozenset(
-                    map(path.abspath, delete_array)
-                )
 
             self.__current_size = 0
             self.__total_size = None
@@ -244,12 +224,8 @@ init -9 python in _translator3000:
                             renpy.restart_interaction()
                 finally:
                     _stream.close()
-
-                delete_array = self.__delete_array.copy()
-                delete_array += frozenset((self.__out_fn,))
-                for _f in delete_array:
-                    if path.isfile(_f):
-                        os.remove(_f)
+                if path.isfile(self.__out_fn):
+                    os.remove(self.__out_fn)
                 utils.create_dir_for_file(self.__out_fn)
                 os.rename(temp_fn, self.__out_fn)
             except Exception as ex:
