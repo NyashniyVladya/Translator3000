@@ -33,7 +33,7 @@ init -10 python in _translator3000:
     else:
         from requests.packages import urllib3
 
-    VERSION = (2, 6, 0)
+    VERSION = (2, 6, 1)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))

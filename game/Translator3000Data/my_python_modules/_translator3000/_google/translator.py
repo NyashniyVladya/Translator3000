@@ -3,7 +3,7 @@
 @author: Vladya
 """
 
-import json
+import urllib
 from os import path
 from .. import (
     translator_abstract,
@@ -25,39 +25,28 @@ except ImportError:
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
 
+    HOSTNAME = "clients5.google.com"
+
     SYMB_LIMIT = 5000
-
-    BASE_URL = urllib3.util.Url(
-        scheme="https",
-        auth=None,
-        host="translate.google.com",
-        port=None,
-        path='/',
-        query=None,
-        fragment=None
-    )
-
-    GOOGLE_RPCIDS = "MkEWBc"
 
     def __init__(self):
         super(Translator, self).__init__()
 
-    @property
-    def request_url(self):
+    def get_base_url(self):
         return urllib3.util.Url(
-            scheme="https",
+            scheme='https',
             auth=None,
-            host=self.BASE_URL.hostname,
+            host=self.HOSTNAME,
             port=None,
-            path="/_/TranslateWebserverUi/data/batchexecute",
+            path="/translate_a/t",
             query=None,
             fragment=None
-        ).url
+        )
 
     def get_lang_code(self, data):
         return utils._get_lang_code(data)
@@ -129,63 +118,25 @@ class Translator(translator_abstract.TranslatorAbstract):
 
     def _web_translate(self, text, dest, src):
 
-        extra_headers = {"Referer": self.BASE_URL.url}
-
-        request = current_session.post(
-            self.request_url,
-            data=self._get_request_data(text, dest, src),
-            headers=extra_headers
-        )
-
-        _json_start = request.content.find('[')
-        answer = json.loads(request.content[_json_start:], encoding="utf_8")
-        answer = json.loads(answer[0][2])
-        answer = answer[1][0][0][5]
-
-        result = u""
-        for data in answer:
-            add_space = False
-            if len(data) >= 3:
-                add_space = data[2]
-            if add_space:
-                result += u' '
-            result += data[0]
-
-        return result.strip()
-
-    def _get_request_data(self, text, dest, src):
-
-        """
-        Generates the json string containing the query:
-            [
-                [
-                    [
-                        "MkEWBc",
-                        "[[\"Hello, world!\",\"en\",\"ru\",true],[1]]",
-                        null,
-                        "generic"
-                    ]
-                ]
-            ]
-        Main request:
-            [
-                [
-                    "Hello, world!",
-                    "en",
-                    "ru",
-                    true
-                ],
-                [
-                    1
-                ]
-            ]
-        """
-
         dest, src = map(self.get_lang_code, (dest, src))
-        if not isinstance(text, unicode):
-            text = text.decode("utf_8", "ignore")
+        params = {
+            "client": "dict-chrome-ex",
+            "sl": src,
+            "tl": dest,
+            "q": text.encode("utf_8", "ignore")
+        }
 
-        query = [[text, src, dest, True], [1]]
-        query_string = json.dumps(query, separators=(',', ':'))
-        full_query = [[[self.GOOGLE_RPCIDS, query_string, None, "generic"]]]
-        return {"f.req": json.dumps(full_query, separators=(',', ':'))}
+        base_url = self.get_base_url()
+        url = urllib3.util.Url(
+            scheme=base_url.scheme,
+            auth=base_url.auth,
+            host=base_url.host,
+            port=base_url.port,
+            path=base_url.path,
+            query=urllib.urlencode(params),
+            fragment=base_url.fragment
+        ).url
+
+        request = current_session.get(url)
+        answer = request.json()
+        return answer["sentences"][0]["trans"]
