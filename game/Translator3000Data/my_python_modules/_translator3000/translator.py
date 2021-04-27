@@ -48,3 +48,7 @@ class Translator(object):
     def backup_database(self, service):
         translator = self._get_translator(service)
         return translator.backup_database()
+
+    def clear_cache(self, service, local):
+        translator = self._get_translator(service)
+        return translator.clear_cache(local)

@@ -287,6 +287,14 @@ init -7 python in _translator3000:
             _service = self._setting["translationService"]
             return self._translator_object.backup_database(_service)
 
+        def clear_cache(self):
+            _service = self._setting["translationService"]
+            return self._translator_object.clear_cache(_service, False)
+
+        def clear_local_cache(self):
+            _service = self._setting["translationService"]
+            return self._translator_object.clear_cache(_service, True)
+
         def get_all_lang_codes(self):
             """
             Возвращает генератор доступных направлений,

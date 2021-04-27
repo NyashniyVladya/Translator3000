@@ -236,3 +236,31 @@ translate english strings:
     old "Выбрать из использовавшихся ранее."
     new "Pick from the previously used ones."
 
+# TODO: Translation updated at 2021-04-28 01:50
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:19
+    old "Да."
+    new "Yes."
+
+    # game/000translate_trigger.rpy:28
+    old "Кэш переводов будет очищен."
+    new "The translation cache will be cleared."
+
+    # game/000translate_trigger.rpy:29
+    old "Кэш переводов для игры будет очищен."
+    new "The translation cache for the game will be cleared."
+
+    # game/000translate_trigger.rpy:42
+    old "Нет."
+    new "No."
+
+    # game/000translate_trigger.rpy:43
+    old "Очистить весь кэш переводов."
+    new "Clear all translation cache."
+
+    # game/000translate_trigger.rpy:44
+    old "Очистить кэш переводов игры."
+    new "Clear the cache of translations of the game."
+

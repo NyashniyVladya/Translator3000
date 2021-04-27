@@ -25,10 +25,14 @@ except ImportError:
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.0.4"
+    __version__ = "1.1.0"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
+    LOCAL_DATABASE_FN = path.join(
+        _paths.LOCAL_DATABASE_FOLDER,
+        u"translations.json"
+    )
 
     HOSTNAME = "clients5.google.com"
 
@@ -101,8 +105,16 @@ class Translator(translator_abstract.TranslatorAbstract):
             _text_db = _lang_db.setdefault(text, {})
 
             if dest in _text_db:
+                result = _text_db[dest]
+                self.add_translate_to_local_database(
+                    text,
+                    dest,
+                    src,
+                    result,
+                    _update_on_hdd
+                )
                 self.LOGGER.debug("Translation is available in database.")
-                return _text_db[dest]
+                return result
 
             self.LOGGER.debug("Translation is not available in database.")
 
@@ -110,11 +122,18 @@ class Translator(translator_abstract.TranslatorAbstract):
             self.LOGGER.debug("Successfully translated.")
 
             _text_db[dest] = result
+            self.add_translate_to_local_database(
+                text,
+                dest,
+                src,
+                result,
+                False
+            )
 
-        if _update_on_hdd:
-            self.backup_database()
+            if _update_on_hdd:
+                self.backup_database()
 
-        return result
+            return result
 
     def _web_translate(self, text, dest, src):
 
@@ -138,5 +157,9 @@ class Translator(translator_abstract.TranslatorAbstract):
         ).url
 
         request = current_session.get(url)
-        answer = request.json()
-        return answer["sentences"][0]["trans"]
+        _json = request.json()
+        result = ""
+        for answer in _json["sentences"]:
+            if "trans" in answer:
+                result += answer["trans"]
+        return result

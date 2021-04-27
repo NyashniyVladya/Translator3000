@@ -56,6 +56,12 @@ init -98:
             textbutton translator3000._gui.translate("Сделать бэкап БД."):
                 action Function(translator3000.backup_database)
 
+            textbutton translator3000._gui.translate("Очистить кэш переводов игры."):
+                action translator3000._gui.ConfirmAction("Кэш переводов для игры будет очищен.", Function(translator3000.clear_local_cache))
+
+            textbutton translator3000._gui.translate("Очистить весь кэш переводов."):
+                action translator3000._gui.ConfirmAction("Кэш переводов будет очищен.", Function(translator3000.clear_cache))
+
             textbutton translator3000._gui.translate("Поменять язык интерфейса."):
                 action translator3000._gui.ForwardAction("translator3000_gui_language")
 
@@ -66,6 +72,18 @@ init -98:
             use translator3000_github_update
             null height 10
             use translator3000_prescan_status
+
+    screen translator3000_confirm_screen(message, yes_action):
+
+        tag translator3000_screen
+        style_prefix "translator3000"
+
+        use translator3000_base_vbox_in_window:
+            label translator3000._gui.translate(message)
+            textbutton translator3000._gui.translate("Да."):
+                action (yes_action, translator3000._gui.BackAction())
+            textbutton translator3000._gui.translate("Нет."):
+                action translator3000._gui.BackAction()
 
     screen translator3000_gui_language:
 

@@ -149,6 +149,13 @@ init -97 python in _translator3000_gui:
 
             self.initialized = True
 
+        def _confirm(self, message, action):
+            return self._forward(
+                "translator3000_confirm_screen",
+                message=message,
+                yes_action=action
+            )
+
         def _back(self):
 
             if not renpy.context()._menu:
@@ -171,6 +178,9 @@ init -97 python in _translator3000_gui:
             return renpy.run(
                 store.ShowMenu(dest_screen, *screen_args, **screen_kwargs)
             )
+
+        def ConfirmAction(self, message, action):
+            return store.Function(self._confirm, message, action)
 
         def BackAction(self):
             """
