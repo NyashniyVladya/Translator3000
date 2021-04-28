@@ -2,22 +2,27 @@
 init -99:
 
     style translator3000_viewport is default:
+        alt ""
         xmaximum _translator3000_gui.window_width
         ymaximum _translator3000_gui.window_height
 
     style translator3000_window is default:
+        alt ""
         xmaximum _translator3000_gui.window_width
         ymaximum _translator3000_gui.window_height
         xpadding 5
         ypadding 5
 
     style translator3000_bar is bar:
+        alt ""
         xmaximum _translator3000_gui.window_width
 
     style translator3000_vbar is vbar:
+        alt ""
         ymaximum _translator3000_gui.window_height
 
     style translator3000_vbox is default:
+        alt ""
         xfill True
         box_layout "vertical"
         first_spacing 15
@@ -28,6 +33,7 @@ init -99:
         first_spacing None
 
     style translator3000_text is default:
+        alt ""
         size 25
         font "Translator3000OtherFiles/DejaVuSans.ttf"
         color "#eee"
