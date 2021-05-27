@@ -8,6 +8,7 @@ init -10 python in _translator3000:
     import time
     import copy
     import os
+    import pickle
     import logging
     import requests
     import threading
@@ -25,7 +26,8 @@ init -10 python in _translator3000:
         LOGGER as parent_logger,
         current_session,
         translator,
-        utils
+        utils,
+        _paths
     )
 
     if renpy.version(True) >= (7, 4, 0):
@@ -33,10 +35,74 @@ init -10 python in _translator3000:
     else:
         from requests.packages import urllib3
 
-    VERSION = (2, 7, 1)
+    VERSION = (2, 8, 0)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))
     LOGGER = parent_logger.getChild("Ren'Py")
 
     SingleTone = store.translator3000_preinit.SingleTone
+
+    class _MultiGameData(SingleTone):
+
+        """
+        Вообще, по идее, эта логика должна работать через MultiPersistent,
+        но в старых версиях ренпая он поломан, так что,
+        для совместимости со всеми версиями, делаем рабочий "велосипед".
+        """
+
+        __author__ = "Vladya"
+        __version__ = "1.0.0"
+
+        lock = threading.RLock()
+
+        filename = path.join(
+            _paths.DATABASE_FOLDER,
+            "Ren'Py MuitiGame Data.pickle"
+        )
+
+        pickle_protocol = 2
+
+        @classmethod
+        def get_object(cls):
+
+            with cls.lock:
+
+                if path.isfile(cls.filename):
+                    try:
+                        with open(cls.filename, "rb") as _file:
+                            final_object = pickle.load(_file)
+                        major, minor, patch = map(
+                            int,
+                            final_object._version.split('.')
+                        )
+                        delattr(final_object, "_version")
+                        if major == int(cls.__version__.split('.')[0]):
+                            return final_object
+                    except Exception as ex:
+                        if DEBUG:
+                            raise ex
+
+                return cls()
+
+        def __getattr__(self, name):
+            if name.startswith("__") and name.endswith("__"):
+                raise AttributeError(name)
+            return None
+
+        def __getstate__(self):
+            with self.lock:
+                data = copy.deepcopy(self.__dict__)
+            data.pop("initialized", None)
+            data["_version"] = self.__version__
+            return data
+
+        def __setstate__(self, data):
+            with self.lock:
+                self.__dict__.update(copy.deepcopy(data))
+                self.initialized = True
+
+        def save(self):
+            with self.lock:
+                savebytes = pickle.dumps(self, self.pickle_protocol)
+                utils.save_data_to_file(savebytes, self.filename)

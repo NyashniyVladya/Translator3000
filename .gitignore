@@ -137,6 +137,7 @@ traceback.txt
 
 #Extra files.
 _translator3000Data/
+local translations/
 game/translator3000_ingame_files
 _translator3000_setting.json
 Translator3000.rpa

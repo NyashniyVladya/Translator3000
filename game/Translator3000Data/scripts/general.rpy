@@ -14,7 +14,7 @@ init -7 python in _translator3000:
             path.join(config.gamedir, _renpy_folder, "multigame_fonts")
         )
 
-        _multi_persistent = store.MultiPersistent("translator3000_data")
+        _multi_persistent = _MultiGameData.get_object()
 
         MULTIGAME_KEYS = (
             # Настройки, сохраняющиеся в системе и включающиеся по умолчанию
