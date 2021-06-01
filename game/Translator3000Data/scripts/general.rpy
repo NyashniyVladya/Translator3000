@@ -359,16 +359,16 @@ init -7 python in _translator3000:
 
             return result
 
-        def _get_original(self, translated_text):
-            if translated_text in self._original_mapping:
-                return self._original_mapping[translated_text]
-            return translated_text
-
         def _history_callback(self, entry_object):
+
             if not hasattr(entry_object, "translator3000_original_what"):
-                entry_object.translator3000_original_what = self._get_original(
-                    entry_object.what
-                )
+                for k, v in self._original_mapping.copy().iteritems():
+                    if entry_object.what in (k, v):
+                        entry_object.translator3000_original_what = v
+                        break
+                else:
+                    return
+
             if self._setting["originalInHistory"]:
                 entry_object.what = "{{#notTranslate}}{0}".format(
                     entry_object.translator3000_original_what

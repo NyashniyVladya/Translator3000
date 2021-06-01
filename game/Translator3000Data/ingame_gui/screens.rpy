@@ -17,7 +17,7 @@ init -98:
             window:
                 hbox:
                     box_reverse True
-                    textbutton "[[<=]":
+                    textbutton "{{#notTranslate}}{0}".format("[[<=]"):
                         # Закрыть окно.
                         align (1., .0)
                         action (_actions + (translator3000._gui.BackAction(),))
@@ -95,7 +95,7 @@ init -98:
         use translator3000_base_vbox_in_window:
             label translator3000._gui.translate("Язык интерфейса (не перевода).")
             for t in sorted(translator3000._gui.available_languages):
-                textbutton translator3000.quote(t).title():
+                textbutton "{{#notTranslate}}{0}".format(translator3000.quote(t).title()):
                     action SetField(translator3000._gui, "gui_language", t)
 
     screen translator3000_set_language(field_name):
@@ -111,9 +111,11 @@ init -98:
                 translator3000.get_all_lang_codes(),
                 key=lambda _c: translator3000._translator_object.get_lang_name(translator3000._setting["translationService"], _c)
             ):
-                textbutton translator3000.quote(
-                    translator3000._translator_object.get_lang_name(translator3000._setting["translationService"], code)
-                ).title():
+                textbutton "{{#notTranslate}}{0}".format(
+                    translator3000.quote(
+                        translator3000._translator_object.get_lang_name(translator3000._setting["translationService"], code)
+                    ).title()
+                ):
                     action (
                         SetDict(translator3000._setting, field_name, code),
                         translator3000._gui.ApplySettingAction(True)
@@ -133,8 +135,10 @@ init -98:
 
         window:
             yalign 1.
-            text translator3000._apply_enabled_text_tags(
-                translator3000.quote(translator3000._gui._sample_text)
+            text "{{#notTranslate}}{0}".format(
+                translator3000._apply_enabled_text_tags(
+                    translator3000.quote(translator3000._gui._sample_text)
+                )
             ):
                 layout "tex"
                 align (
@@ -157,8 +161,8 @@ init -98:
             label translator3000._gui.translate("Настройки шрифта.")
 
             if translator3000._setting["extraTextOptions"]["font"] is not None:
-                text translator3000.quote(
-                    translator3000._gui._fs_object.get_clear_filename(translator3000._setting["extraTextOptions"]["font"])
+                text "{{#notTranslate}}{0}".format(
+                    translator3000.quote(translator3000._gui._fs_object.get_clear_filename(translator3000._setting["extraTextOptions"]["font"]))
                 ):
                     size 30
 
@@ -167,7 +171,7 @@ init -98:
                 for fnt in reversed(
                     tuple(translator3000._multi_persistent.fonts.iterkeys())
                 ):
-                    textbutton translator3000.quote(translator3000._gui._fs_object.get_clear_filename(fnt)):
+                    textbutton "{{#notTranslate}}{0}".format(translator3000.quote(translator3000._gui._fs_object.get_clear_filename(fnt))):
                         action Function(
                             translator3000._gui._set_font_pref,
                             fnt,
@@ -177,7 +181,7 @@ init -98:
             else:
 
                 if current_dir:
-                    text current_dir
+                    text "{{#notTranslate}}{0}".format(current_dir)
                     textbutton translator3000._gui.translate("Перейти в предыдущую директорию."):
                         action SetScreenVariable(
                             "current_dir",
@@ -206,8 +210,10 @@ init -98:
                         )
                         $ ext = _translator3000_gui.path.splitext(full_path)[1]
                         if ext.lower() in translator3000._gui._fs_object.available_font_exts:
-                            textbutton translator3000.quote(
-                                translator3000._gui._fs_object.get_clear_filename(_filename)
+                            textbutton "{{#notTranslate}}{0}".format(
+                                translator3000.quote(
+                                    translator3000._gui._fs_object.get_clear_filename(_filename)
+                                )
                             ):
                                 action Function(
                                     translator3000._gui._set_font_pref,
@@ -241,13 +247,13 @@ init -98:
                 if translator3000._setting["extraTextOptions"]["size"] is None:
                     text translator3000._gui.translate("Не установлено.")
                 else:
-                    text "{size}".format(**translator3000._setting["extraTextOptions"]):
+                    text "{{#notTranslate}}{size}".format(**translator3000._setting["extraTextOptions"]):
                         size 30
                 vbox:
                     for _mod in "+-":
                         $ _false = unicode(translator3000._gui._text_size_without_mod)
                         $ _true = "{0}{1}".format(_mod, _false)
-                        textbutton _mod:
+                        textbutton "{{#notTranslate}}{0}".format(_mod):
                             text_size 30
                             action (
                                 ToggleDict(
@@ -269,8 +275,8 @@ init -98:
                 if translator3000._setting["extraTextOptions"]["font"] is None:
                     text translator3000._gui.translate("Не установлено.")
                 else:
-                    text translator3000.quote(
-                        translator3000._gui._fs_object.get_clear_filename(translator3000._setting["extraTextOptions"]["font"])
+                    text "{{#notTranslate}}{0}".format(
+                        translator3000.quote(translator3000._gui._fs_object.get_clear_filename(translator3000._setting["extraTextOptions"]["font"]))
                     ):
                         size 30
                     textbutton translator3000._gui.translate("Сбросить."):
@@ -319,12 +325,14 @@ init -98:
                     if translator3000._setting[_key] is None:
                         text translator3000._gui.translate("Не установлено.")
                     else:
-                        text translator3000.quote(
-                            translator3000._translator_object.get_lang_name(
-                                translator3000._setting["translationService"],
-                                translator3000._setting[_key]
-                            )
-                        ).title()
+                        text "{{#notTranslate}}{0}".format(
+                            translator3000.quote(
+                                translator3000._translator_object.get_lang_name(
+                                    translator3000._setting["translationService"],
+                                    translator3000._setting[_key]
+                                )
+                            ).title()
+                        )
                     textbutton translator3000._gui.translate("Сменить."):
                         action translator3000._gui.ForwardAction(
                             "translator3000_set_language",
@@ -353,7 +361,7 @@ init -98:
                 label translator3000._gui.translate("Сервис перевода.")
                 $ services = translator3000._translator_object.get_available_translator_services()
                 for srv in services:
-                    textbutton translator3000.quote(srv.title()):
+                    textbutton "{{#notTranslate}}{0}".format(translator3000.quote(srv.title())):
                         action (
                             SetDict(translator3000._setting, "translationService", srv),
                             translator3000._gui.ApplySettingAction(True)
@@ -468,5 +476,5 @@ init -98:
                     text translator3000._gui.translate("Переведено {done} строк из {total}.").format(
                         **translator3000._translate_preparer.get_info()
                     )
-                    text "{0:.1%}".format(translator3000._translate_preparer.status)
+                    text "{{#notTranslate}}{0}".format("{0:.1%}".format(translator3000._translate_preparer.status))
                     bar value StaticValue(translator3000._translate_preparer.status)
