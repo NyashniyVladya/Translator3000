@@ -196,11 +196,19 @@ init -97 python in _translator3000_gui:
                 **screen_kwargs
             )
 
-        def ApplySettingAction(self, restart_prescan_thread=False):
-            translator = self._translator
-            funcs = [translator._dump_setting, translator._check_setting]
+        def ApplySettingAction(
+            self,
+            restart_prescan_thread=False,
+            update_work_method=False
+        ):
+            funcs = [
+                self._translator._dump_setting,
+                self._translator._check_setting,
+            ]
             if restart_prescan_thread:
-                funcs.append(translator._translate_preparer.restart)
+                funcs.append(self._translator._translate_preparer.restart)
+            if update_work_method:
+                funcs.append(self._translator.update_work_method)
             return tuple(map(store.Function, funcs))
 
         def is_correct_font(self, renpy_path_to_font):
@@ -387,7 +395,7 @@ init -97 python in _translator3000_gui:
         def get_persistent_name(name):
             return "translator3000_{0}".format(name)
 
-        def translate(self, text, language=None):
+        def translate(self, text, language=None, not_translate_mark=True):
             """
             Небольшая обёртка над 'renpy.translation.translate_string'.
             По сути, аналог ренпаевского '__', но с конкретным указанием языка.
@@ -400,7 +408,10 @@ init -97 python in _translator3000_gui:
                 language = self.gui_language
             if language not in self.available_languages:
                 raise ValueError("Incorrect language '{0}'.".format(language))
-            return renpy.translation.translate_string(
+            result = renpy.translation.translate_string(
                 text,
                 language=language
             )
+            if not_translate_mark:
+                result = "###notTranslate###{0}".format(result)
+            return result

@@ -22,6 +22,7 @@ init -7 python in _translator3000:
             "gameLanguage",
             "directionOfTranslation",
             "translationService",
+            "workMethod",
             "originalInHistory",
             "extraTextOptions"
         )
@@ -31,6 +32,7 @@ init -7 python in _translator3000:
             "prescan": False,
             "_debug_mode": False,
             "translationService": "google",
+            "workMethod": "dialogueOnly",
             "originalInHistory": False,
             "requestsFrequency": None,
             "extraTextOptions": {
@@ -40,6 +42,7 @@ init -7 python in _translator3000:
                 "bold": False
             }
         }
+
 
         def __init__(self):
 
@@ -85,6 +88,8 @@ init -7 python in _translator3000:
 
             self._original_mapping = {}
 
+            self._all_text_in_game = set()
+
             self._translator_object = translator.Translator()
             self._translate_preparer = Preparer(translator_object=self)
             self._github_checker = GitChecker(translator_object=self)
@@ -109,7 +114,9 @@ init -7 python in _translator3000:
                 _tr_object._translate_preparer._switcher = True
                 _tr_object._gui.show = True
 
-            config.say_menu_text_filter = _tr_object
+            renpy.text.text.Text.set_text = _tr_object._get_text_method()
+            _tr_object.update_work_method()
+
             config.history_callbacks.append(_tr_object._history_callback)
 
             setattr(store, "translator3000", _tr_object)
@@ -118,6 +125,98 @@ init -7 python in _translator3000:
             _tr_object._github_checker.init_download_process()
             if _tr_object._github_checker._download_process:
                 _tr_object._gui.show = True
+
+        def _get_text_method(self):
+
+            def set_text(text_self, text, *args, **kwargs):
+
+                self._all_text_in_game.add(text_self)
+                _translate = (self._setting["workMethod"] == "allText")
+
+                if not isinstance(text, __builtin__.list):
+                    text = [text]
+
+                new_text = []
+                for t in text:
+
+                    if not isinstance(t, basestring):
+                        new_text.append(t)
+                        continue
+
+                    if not isinstance(t, unicode):
+                        t = t.decode("utf_8", "replace")
+
+                    _first_mark = "###notTranslate###"
+                    _second_mark = "{#notTranslate}"
+                    if t.startswith(_second_mark) or (_first_mark in t):
+                        # Метка "не переводить".
+                        t = t.replace(_first_mark, "")
+                        if not t.startswith(_second_mark):
+                            t = "{0}{1}".format(_second_mark, t)
+                        new_text.append(t)
+                        continue
+
+                    if _translate:
+                        t = self.__call__(
+                            renpy.translation.translate_string(t),
+                            _check_double_call=True
+                        )
+
+                    new_text.append(t)
+
+                text = new_text
+
+                return _ORIGINAL_SET_TEXT_METHOD(
+                    text_self,
+                    text,
+                    *args,
+                    **kwargs
+                )
+
+            return types.MethodType(set_text, None, renpy.text.text.Text)
+
+        def update_work_method(self):
+
+            method = self._setting["workMethod"]
+            _allow_methods = ("dialogueOnly", "allText")
+            if method not in _allow_methods:
+                if DEBUG:
+                    error_message = (
+                        "Способ работы переводчика \"{0}\" неизвестен."
+                    )
+                    raise Exception(
+                        self._gui.translate(error_message).format(method)
+                    )
+                method = "dialogueOnly"
+
+            if method == "dialogueOnly":
+
+                config.say_menu_text_filter = self
+                config.developer = _ORIGINAL_DEVELOPER_MODE
+
+            elif method == "allText":
+
+                config.say_menu_text_filter = None
+
+                # Иначе проверка будет говорить,
+                # что текст на экране не соответствует тому, что в скрипте.
+                # Но... Нам ведь это и нужно.
+                config.developer = False
+
+                for text_object in frozenset(self._all_text_in_game):
+                    if not hasattr(text_object, "text_parameter"):
+                        continue
+                    if not hasattr(text_object, "substitute"):
+                        continue
+                    try:
+                        text_object.set_text(
+                            text_object.text_parameter,
+                            substitute=text_object.substitute,
+                            update=True
+                        )
+                    except Exception as ex:
+                        if DEBUG:
+                            raise Exception((text_object.text_parameter, ex))
 
         def add_font_to_database(self, font):
 
@@ -226,7 +325,12 @@ init -7 python in _translator3000:
             """
 
             _force = extra_kwargs.pop("_force", False)
-            _write_in_origin = extra_kwargs.pop("_write_in_origin", True)
+            _check_double_call = extra_kwargs.pop("_check_double_call", False)
+
+            if _check_double_call and (text in self._original_mapping):
+                # Проверяем повторные вызовы
+                # (если метод вызван с собственными результатами).
+                return text
 
             if not (_force or self._translator_switcher):
                 return self._apply_enabled_text_tags(text)
@@ -251,8 +355,7 @@ init -7 python in _translator3000:
             result = self.quote(result)
             result = self._apply_enabled_text_tags(result)
 
-            if _write_in_origin:
-                self._original_mapping[result] = text
+            self._original_mapping[result] = text
 
             return result
 
@@ -267,7 +370,9 @@ init -7 python in _translator3000:
                     entry_object.what
                 )
             if self._setting["originalInHistory"]:
-                entry_object.what = entry_object.translator3000_original_what
+                entry_object.what = "{{#notTranslate}}{0}".format(
+                    entry_object.translator3000_original_what
+                )
 
         def _dump_setting(self):
 
@@ -339,20 +444,21 @@ init -7 python in _translator3000:
                 return s
             return s[0]
 
-        def unquote(self, s):
+        @classmethod
+        def unquote(cls, s):
             """
             Преобразуется форматированный текст в "чистый",
             без тегов, переменных и т.п.
             """
             try:
                 # Подстановка значений вида "[variable]".
-                s = self._substitute(s)
-            except KeyError:
+                s = cls._substitute(s)
+            except (KeyError, ValueError):
                 pass
             try:
                 # То же, но для "%(variable)s".
                 s %= renpy.tag_quoting_dict
-            except KeyError:
+            except (KeyError, ValueError):
                 pass
             # Удаление тегов из текста вида "{b}{i}Some text.{/i}{/b}".
             s = renpy.translation.dialogue.notags_filter(s)

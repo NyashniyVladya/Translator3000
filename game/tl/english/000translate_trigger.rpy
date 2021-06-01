@@ -264,3 +264,35 @@ translate english strings:
     old "Очистить кэш переводов игры."
     new "Clear the cache of translations of the game."
 
+# TODO: Translation updated at 2021-06-01 09:10
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:41
+    old "Параметр не работает в режиме перевода всего текста."
+    new "The parameter does not work in the whole text translation mode."
+
+    # game/000translate_trigger.rpy:42
+    old "При первом включении этого режима игра может \"зависнуть\" на продолжительное время, т.к. необходимо перевести все элементы окружения. Продолжить?"
+    new "The first time you turn on this mode, the game may \"freeze\" for a long time (probably a few minutes), as the translator must translate all the elements of the environment. Continue?"
+
+    # game/000translate_trigger.rpy:44
+    old "Неизвестная ошибка."
+    new "Unknown error."
+
+    # game/000translate_trigger.rpy:49
+    old "Перевод всего текста в игре (Бета)."
+    new "Translation of all text in the game (Beta)."
+
+    # game/000translate_trigger.rpy:50
+    old "Перевод диалогов и меню."
+    new "Translation of dialogs and choice menus."
+
+    # game/000translate_trigger.rpy:69
+    old "Способ работы переводчика."
+    new "Method of work of the translator."
+
+    # game/000translate_trigger.rpy:70
+    old "Способ работы переводчика \"{0}\" неизвестен."
+    new "\"{0}\" translator's method of working is unknown."
+

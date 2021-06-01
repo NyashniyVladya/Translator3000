@@ -360,6 +360,26 @@ init -98:
                         )
 
             vbox:
+                label translator3000._gui.translate("Способ работы переводчика.")
+
+                textbutton translator3000._gui.translate("Перевод диалогов и меню."):
+                    action (
+                        SetDict(translator3000._setting, "workMethod", "dialogueOnly"),
+                        translator3000._gui.ApplySettingAction(update_work_method=True)
+                    )
+
+                textbutton translator3000._gui.translate("Перевод всего текста в игре (Бета)."):
+                    action (
+                        SelectedIf((translator3000._setting["workMethod"] == "allText")),
+                        translator3000._gui.ConfirmAction(
+                            "При первом включении этого режима игра может \"зависнуть\" на продолжительное время, т.к. необходимо перевести все элементы окружения. Продолжить?",
+                            (
+                                SetDict(translator3000._setting, "workMethod", "allText"),
+                                translator3000._gui.ApplySettingAction(update_work_method=True)
+                            )
+                        )
+                    )
+            vbox:
                 label translator3000._gui.translate("Частота запросов.")
                 if translator3000._setting["requestsFrequency"] is None:
                     text translator3000._gui.translate("Не установлено.")

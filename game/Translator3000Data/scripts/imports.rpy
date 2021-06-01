@@ -6,6 +6,7 @@ init -10 python in _translator3000:
 
     import __builtin__
     import time
+    import types
     import copy
     import os
     import pickle
@@ -35,11 +36,14 @@ init -10 python in _translator3000:
     else:
         from requests.packages import urllib3
 
-    VERSION = (2, 8, 0)
+    VERSION = (2, 9, 0)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))
     LOGGER = parent_logger.getChild("Ren'Py")
+
+    _ORIGINAL_SET_TEXT_METHOD = renpy.text.text.Text.set_text
+    _ORIGINAL_DEVELOPER_MODE = config.developer
 
     SingleTone = store.translator3000_preinit.SingleTone
 
