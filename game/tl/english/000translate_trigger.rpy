@@ -65,8 +65,8 @@ translate english strings:
     new "Download is failed."
 
     # game/000translate_trigger.rpy:21
-    old "Загрузка окончена. Перезапустите игру."
-    new "Download is over. Restart the game."
+    old "Загрузка окончена. Файл сохранён рядом с папкой \"game\". Переместите его в папку \"game\", заменив старый."
+    new "Download completed. The file is saved near the \"game\" folder. Move it to the \"game\" folder, replacing the old one."
 
     # game/000translate_trigger.rpy:22
     old "Запустить"

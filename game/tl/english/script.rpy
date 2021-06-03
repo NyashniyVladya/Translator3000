@@ -26,3 +26,21 @@ translate english strings:
     old "Версии сборки и проекта не равны."
     new "Build and project versions are not equal."
 
+# TODO: Translation updated at 2021-06-03 18:16
+
+# game/script.rpy:36
+translate english start_7b4f6d34:
+
+    # "[_a]"
+    "[_a]"
+
+translate english strings:
+
+    # game/script.rpy:28
+    old "Протестировать."
+    new "Test."
+
+    # game/script.rpy:35
+    old "Фраза в этой строке будет переведена."
+    new "The phrase on this string will be translated."
+

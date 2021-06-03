@@ -43,7 +43,6 @@ init -7 python in _translator3000:
             }
         }
 
-
         def __init__(self):
 
             if self.initialized:
@@ -128,10 +127,18 @@ init -7 python in _translator3000:
 
         def _get_text_method(self):
 
-            def set_text(text_self, text, *args, **kwargs):
+            def set_text(
+                text_self,
+                text,
+                scope=None,
+                substitute=False,
+                update=True
+            ):
 
                 self._all_text_in_game.add(text_self)
                 _translate = (self._setting["workMethod"] == "allText")
+                if isinstance(text_self, renpy.display.behavior.Input):
+                    _translate = False
 
                 if not isinstance(text, __builtin__.list):
                     text = [text]
@@ -159,7 +166,8 @@ init -7 python in _translator3000:
                     if _translate:
                         t = self.__call__(
                             renpy.translation.translate_string(t),
-                            _check_double_call=True
+                            _check_double_call=True,
+                            _scope=scope
                         )
 
                     new_text.append(t)
@@ -169,8 +177,9 @@ init -7 python in _translator3000:
                 return _ORIGINAL_SET_TEXT_METHOD(
                     text_self,
                     text,
-                    *args,
-                    **kwargs
+                    scope,
+                    substitute,
+                    update
                 )
 
             return types.MethodType(set_text, None, renpy.text.text.Text)
@@ -326,6 +335,7 @@ init -7 python in _translator3000:
 
             _force = extra_kwargs.pop("_force", False)
             _check_double_call = extra_kwargs.pop("_check_double_call", False)
+            _scope = extra_kwargs.pop("_scope", None)
 
             if _check_double_call and (text in self._original_mapping):
                 # Проверяем повторные вызовы
@@ -339,7 +349,7 @@ init -7 python in _translator3000:
 
                 _params = {
                     "service": self._setting["translationService"],
-                    "text": self.unquote(text),
+                    "text": self.unquote(text, _scope),
                     "dest": self.direction_of_translation,
                     "src": self.game_language,
                     "_update_on_hdd": _update_on_hdd
@@ -435,24 +445,29 @@ init -7 python in _translator3000:
             return _format_string.format(text, tag, value)
 
         @staticmethod
-        def _substitute(s):
+        def _substitute(s, scope=None):
             """
             Заменяем переменные в тексте на конкретные значения.
             """
-            s = renpy.substitutions.substitute(s, force=True, translate=False)
+            s = renpy.substitutions.substitute(
+                s,
+                scope=scope,
+                force=True,
+                translate=False
+            )
             if isinstance(s, basestring):
                 return s
             return s[0]
 
         @classmethod
-        def unquote(cls, s):
+        def unquote(cls, s, scope=None):
             """
             Преобразуется форматированный текст в "чистый",
             без тегов, переменных и т.п.
             """
             try:
                 # Подстановка значений вида "[variable]".
-                s = cls._substitute(s)
+                s = cls._substitute(s, scope)
             except (KeyError, ValueError):
                 pass
             try:

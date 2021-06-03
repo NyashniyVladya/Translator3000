@@ -36,7 +36,7 @@ init -9 python in _translator3000:
                 if self.is_need_update():
                     self._download_process = Downloader(
                         self.download_link,
-                        self._find_file(self.filename)
+                        path.abspath(path.join(config.basedir, self.filename))
                     )
             except Exception as ex:
                 # Проблемы с интернетом.
@@ -50,18 +50,6 @@ init -9 python in _translator3000:
 
         def is_need_update(self):
             return (self.version > VERSION)
-
-        @staticmethod
-        def _find_file(filename):
-            filename = path.normpath(filename)
-            for fn in renpy.list_files():
-                fn = path.normpath(fn)
-                if path.basename(fn) == filename:
-                    for _searchpath in config.searchpath:
-                        full_fn = path.abspath(path.join(_searchpath, fn))
-                        if path.isfile(full_fn):
-                            return full_fn
-            return path.abspath(path.join(config.gamedir, filename))
 
         @property
         def download_link(self):

@@ -31,4 +31,8 @@ label start:
                     "Внимание! Билда собирается с включённым режимом дебага."
                 $ _build_creator.RPACreator.create_build(build.name)
                 "Собрано!"
+            "Протестировать.":
+                $ _a = renpy.input(__("Фраза в этой строке будет переведена."))
+                "[_a]"
+
     return

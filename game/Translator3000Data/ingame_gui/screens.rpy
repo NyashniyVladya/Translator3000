@@ -427,7 +427,7 @@ init -98:
                 elif translator3000._github_checker._download_process.is_over():
                     # Процесс окончен.
                     if translator3000._github_checker._download_process.is_successful():
-                        text translator3000._gui.translate("Загрузка окончена. Перезапустите игру.")
+                        text translator3000._gui.translate("Загрузка окончена. Файл сохранён рядом с папкой \"game\". Переместите его в папку \"game\", заменив старый.")
                     else:
                         text translator3000._gui.translate("Загрузка неудачна.")
                         textbutton translator3000._gui.translate("Бросить трейсбек."):
