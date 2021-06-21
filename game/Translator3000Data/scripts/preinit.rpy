@@ -1,5 +1,5 @@
 
-init -200 python in translator3000_preinit:
+init -50 python in translator3000_preinit:
 
     import store
 

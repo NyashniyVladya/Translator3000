@@ -1,5 +1,5 @@
 
-init -97 python in _translator3000_gui:
+init -37 python in _translator3000_gui:
 
     class FileSystemWrapper(SingleTone):
 

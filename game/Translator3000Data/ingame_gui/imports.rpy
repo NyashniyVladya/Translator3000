@@ -1,5 +1,5 @@
 
-init -100 python in _translator3000_gui:
+init -40 python in _translator3000_gui:
 
     import os
     import hashlib

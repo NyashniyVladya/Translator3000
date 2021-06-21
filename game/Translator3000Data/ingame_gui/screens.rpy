@@ -1,5 +1,5 @@
 
-init -98:
+init -38:
 
     screen translator3000_base_vbox_in_window(*_actions):
 
