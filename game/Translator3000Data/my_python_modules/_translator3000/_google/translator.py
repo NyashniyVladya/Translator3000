@@ -25,7 +25,7 @@ except ImportError:
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.1.2"
+    __version__ = "1.1.3"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
@@ -34,7 +34,7 @@ class Translator(translator_abstract.TranslatorAbstract):
         u"translations.json"
     )
 
-    HOSTNAME = "clients5.google.com"
+    HOSTNAME = "translate.googleapis.com"
 
     SYMB_LIMIT = 5000
 
@@ -47,7 +47,7 @@ class Translator(translator_abstract.TranslatorAbstract):
             auth=None,
             host=self.HOSTNAME,
             port=None,
-            path="/translate_a/t",
+            path="/translate_a/single",
             query=None,
             fragment=None
         )
@@ -139,7 +139,8 @@ class Translator(translator_abstract.TranslatorAbstract):
 
         dest, src = map(self.get_lang_code, (dest, src))
         params = {
-            "client": "dict-chrome-ex",
+            "client": "gtx",
+            "dt": 't',
             "sl": src,
             "tl": dest,
             "q": text.encode("utf_8", "ignore")
@@ -157,13 +158,9 @@ class Translator(translator_abstract.TranslatorAbstract):
         ).url
 
         request = current_session.get(url)
-        _json = request.json()
         self.LOGGER.debug("Answer:\n%s", request.content)
-        if isinstance(_json, dict):
-            result = u""
-            for answer in _json["sentences"]:
-                if "trans" in answer:
-                    result += answer["trans"]
-        else:
-            result = u"".join(_json)
+        _json = request.json()
+        result = u""
+        for translate_part in _json[0]:
+            result += translate_part[0]
         return result

@@ -73,6 +73,10 @@ init -38:
                 action translator3000._gui.ForwardAction("translator3000_user_preferences")
 
             null height 10
+            textbutton translator3000._gui.translate("Поддержать разработчика."):
+                action OpenURL("https://www.patreon.com/NyashniyVladya")
+
+            null height 10
             use translator3000_github_update
             null height 10
             use translator3000_prescan_status

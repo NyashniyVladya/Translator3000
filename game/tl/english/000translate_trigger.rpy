@@ -296,3 +296,11 @@ translate english strings:
     old "Способ работы переводчика \"{0}\" неизвестен."
     new "\"{0}\" translator's method of working is unknown."
 
+# TODO: Translation updated at 2022-02-03 21:24
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:53
+    old "Поддержать разработчика."
+    new "Support the developer."
+
