@@ -15,9 +15,13 @@
     * *Change the font to one that supports the characters of the language you want.*
         * *Instructions for installing fonts can be found on the releases page.*
         * **Where can I find the fonts?**
-           * By the search query "fonts download" in any search engine.
-2. **The game ***\<insert game name\>*** does not translate (or does not start), although the other games are fine.**
+           * *By the search query "fonts download" in any search engine.*
+    
+1. **The game ***\<insert game name\>*** does not translate (or does not start), although the other games are fine.**
     * *How a game is made depends on the developer. Depending on the implementation, there may be conflicts in individual games. Get over it. There's nothing I can do here. Compatibility with all games in the universe, unfortunately, can not be realized.*
+    
+1. **With the translator the game starts to "freeze"..**
+    * *Translation takes place in real time. It takes some time to send a request, process the response and output the text. And freezes, when reading new phrases for the first time, are inevitable. When reading the same phrases again, there will be no freezes, because translations are cached.*
     
 </details>
 
@@ -31,9 +35,12 @@
     * *Смените шрифт на другой, поддерживающий нужный Вам язык.*
         * *Инструкция по установке шрифта находится на странице релизов.*
         * **Где я могу найти шрифты?**
-           * По запросу "шрифты скачать" в любом поисковике.
-2. **Игра ***\<вставить имя игры\>*** не переводится (или не запускается).**
+           * *По запросу "шрифты скачать" в любом поисковике.*
+1. **Игра ***\<вставить имя игры\>*** не переводится (или не запускается).**
     * *Как сделана та или иная игра зависит от разработчика. В зависимости от реализации, могут быть конфликты в отдельных играх. Смиритесь. Здесь я ничего не могу поделать. Совместимость со всеми играми во вселенной реализовать, к сожалению, не получится.*
+1. **С переводчиком игра начинает "подвисать" / "подлагивать" / "фризить".**
+    * Перевод происходит в реальном времени. На отправку запросу запроса, обработку ответа и вывод текста тратится некоторое время. И лаги, при первом чтении новых фраз, неизбежны. При повторном прочтении этих же самых мест, лагов не будет, т.к. переводы кэшируются.
+    
     
 </details>
 
