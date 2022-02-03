@@ -14,7 +14,7 @@ from . import (
 )
 
 __author__ = "Vladya"
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 RENPY_WITH_REQUESTS = (7, 4, 0)
 

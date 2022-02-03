@@ -359,7 +359,7 @@ init -7 python in _translator3000:
 
             except Exception as ex:
                 if DEBUG:
-                    raise ex
+                    raise Exception((text, ex))
                 return self._apply_enabled_text_tags(text)
 
             result = self.quote(result)
