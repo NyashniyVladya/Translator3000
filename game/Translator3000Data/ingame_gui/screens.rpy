@@ -45,9 +45,13 @@ init -38:
             $ state = "Возобновить перевод."
 
         use translator3000_base_vbox_in_window:
-            label "Translator3000. {0}".format(
+            textbutton "Translator3000. {0}".format(
                 translator3000._gui.translate("Версия {0}.{1}.{2}.")
-            ).format(*_translator3000.VERSION)
+            ).format(*_translator3000.VERSION):
+                text_style "translator3000_label_text"
+                text_hover_color "#888"
+                text_selected_outlines [(2, "#000", 0, 0), (1, "#050", 0, 0)]
+                action OpenURL("https://www.patreon.com/NyashniyVladya")
             textbutton translator3000._gui.translate(state):
                 action ToggleField(
                     translator3000,

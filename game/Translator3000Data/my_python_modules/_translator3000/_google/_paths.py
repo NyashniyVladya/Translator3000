@@ -6,7 +6,7 @@
 from os import path
 from .. import _paths
 
-_database_struct_version = u"1.3"
+_database_struct_version = u"1.4"
 DATABASE_FOLDER = path.join(
     _paths.DATABASE_FOLDER,
     u"Google",

@@ -25,7 +25,7 @@ except ImportError:
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.1.1"
+    __version__ = "1.1.2"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
@@ -158,6 +158,12 @@ class Translator(translator_abstract.TranslatorAbstract):
 
         request = current_session.get(url)
         _json = request.json()
-        self.LOGGER.debug("Answer:\n%s", request.text)
-        result = "".join(_json)
+        self.LOGGER.debug("Answer:\n%s", request.content)
+        if isinstance(_json, dict):
+            result = u""
+            for answer in _json["sentences"]:
+                if "trans" in answer:
+                    result += answer["trans"]
+        else:
+            result = u"".join(_json)
         return result
