@@ -8,17 +8,26 @@ import json
 import copy
 import threading
 from os import path
-from . import utils
+from . import (
+    utils,
+    lang_codes,
+    _paths
+)
 
 
 class TranslatorAbstract(object):
 
     __author__ = "Vladya"
-    __version__ = "1.1.0"
+    __version__ = "1.2.0"
 
     LOGGER = None
     DATABASE_FN = None
     LOCAL_DATABASE_FN = None
+
+    SYMB_LIMIT = None
+    TRANSLATOR_NAME = None
+
+    FORCE_RPM = None
 
     def __init__(self):
 
@@ -28,15 +37,35 @@ class TranslatorAbstract(object):
         self._database = {}
         self._local_db = {}
         if path.isfile(self.DATABASE_FN):
-            with open(self.DATABASE_FN, "rb") as _db_file:
-                _global_database = json.load(_db_file)
-            self._database.update(copy.deepcopy(_global_database))
+            try:
+                with open(self.DATABASE_FN, "rb") as _db_file:
+                    _global_database = json.load(_db_file)
+            except Exception as ex:
+                broken_db_path = path.join(
+                    _paths.DEBUG_FOLDER,
+                    u"broken_global_database.json"
+                )
+                with open(self.DATABASE_FN, "rb") as _db_file:
+                    utils.save_data_to_file(_db_file, broken_db_path)
+                raise ex
+            else:
+                self._database.update(copy.deepcopy(_global_database))
 
         if path.isfile(self.LOCAL_DATABASE_FN):
-            with open(self.LOCAL_DATABASE_FN, "rb") as _db_file:
-                _local_database = json.load(_db_file)
-            self._database.update(copy.deepcopy(_local_database))
-            self._local_db.update(copy.deepcopy(_local_database))
+            try:
+                with open(self.LOCAL_DATABASE_FN, "rb") as _db_file:
+                    _local_database = json.load(_db_file)
+            except Exception as ex:
+                broken_db_path = path.join(
+                    _paths.DEBUG_FOLDER,
+                    u"broken_local_database.json"
+                )
+                with open(self.LOCAL_DATABASE_FN, "rb") as _db_file:
+                    utils.save_data_to_file(_db_file, broken_db_path)
+                raise ex
+            else:
+                self._database.update(copy.deepcopy(_local_database))
+                self._local_db.update(copy.deepcopy(_local_database))
 
         self.backup_database()
 
@@ -68,6 +97,80 @@ class TranslatorAbstract(object):
                 self.LOCAL_DATABASE_FN
             )
             self.LOGGER.debug("Backup has been created.")
+
+    def translate(self, text, dest, src, _update_on_hdd=True):
+
+        dest, src = map(self.get_lang_code, (dest, src))
+        text = text.strip()
+
+        if not text:
+            return u""
+
+        if not isinstance(text, unicode):
+            text = text.decode("utf_8", "ignore")
+
+        parts = tuple(self.get_parts_from_text(text))
+        if len(parts) > 1:
+
+            def _translate_child(txt):
+                return self.translate(txt, dest, src, _update_on_hdd)
+
+            return self.join_parts_to_text(map(_translate_child, parts))
+
+        elif not parts:
+            return u""
+
+        text = parts[0]
+        if self.SYMB_LIMIT is not None:
+            if len(text) >= self.SYMB_LIMIT:
+                text = u"{0}...".format(text[:(self.SYMB_LIMIT - 4)].strip())
+
+        _text_for_log = text
+        if len(_text_for_log) >= 100:
+            _text_for_log = u"{0}...".format(_text_for_log[:96].strip())
+
+        with self._database_lock:
+
+            self.LOGGER.debug(
+                "Start translating \"%s\" from %s to %s.",
+                _text_for_log.encode("utf_8", "ignore"),
+                self.get_lang_name(src).lower(),
+                self.get_lang_name(dest).lower()
+            )
+
+            _lang_db = self._database.setdefault(src, {})
+            _text_db = _lang_db.setdefault(text, {})
+
+            if dest in _text_db:
+                result = _text_db[dest]
+                self.add_translate_to_local_database(
+                    text,
+                    dest,
+                    src,
+                    result,
+                    _update_on_hdd
+                )
+                self.LOGGER.debug("Translation is available in database.")
+                return result
+
+            self.LOGGER.debug("Translation is not available in database.")
+
+            result = self._web_translate(text, dest, src)
+            self.LOGGER.debug("Successfully translated.")
+
+            _text_db[dest] = result
+            self.add_translate_to_local_database(
+                text,
+                dest,
+                src,
+                result,
+                False
+            )
+
+            if _update_on_hdd:
+                self.backup_database()
+
+            return result
 
     def add_translate_to_local_database(self, text, dest, src, tr, _upd=True):
 
@@ -120,6 +223,9 @@ class TranslatorAbstract(object):
                 self.backup_database()
                 self.LOGGER.debug("Local cache is cleared.")
 
+    def _web_translate(self, text, dest, src):
+        raise NotImplementedError("Should be redefined.")
+
     @staticmethod
     def get_parts_from_text(text):
         if not isinstance(text, basestring):
@@ -134,14 +240,11 @@ class TranslatorAbstract(object):
         parts = tuple(parts)
         return u'\n'.join(parts)
 
-    def translate(self, text, dest, src, _update_on_hdd=True):
-        raise NotImplementedError("Should be redefined.")
-
     def get_lang_code(self, data):
-        raise NotImplementedError("Should be redefined.")
+        return lang_codes.get_lang_code(data, self.TRANSLATOR_NAME)
 
     def get_lang_name(self, data):
-        raise NotImplementedError("Should be redefined.")
+        return lang_codes.get_lang_name(data)
 
     def get_all_lang_codes(self):
-        raise NotImplementedError("Should be redefined.")
+        return lang_codes.get_lang_codes_for_translator(self.TRANSLATOR_NAME)

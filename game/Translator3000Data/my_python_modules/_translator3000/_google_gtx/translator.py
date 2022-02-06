@@ -10,8 +10,6 @@ from .. import (
     current_session
 )
 from . import (
-    utils,
-    consts,
     _paths,
     LOGGER
 )
@@ -25,7 +23,9 @@ except ImportError:
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.1.3"
+    __version__ = "1.2.0"
+
+    TRANSLATOR_NAME = "google"
 
     LOGGER = LOGGER.getChild("Translator")
     DATABASE_FN = path.join(_paths.DATABASE_FOLDER, u"translations.json")
@@ -33,6 +33,8 @@ class Translator(translator_abstract.TranslatorAbstract):
         _paths.LOCAL_DATABASE_FOLDER,
         u"translations.json"
     )
+
+    FORCE_RPM = 12.
 
     HOSTNAME = "translate.googleapis.com"
 
@@ -51,16 +53,6 @@ class Translator(translator_abstract.TranslatorAbstract):
             query=None,
             fragment=None
         )
-
-    def get_lang_code(self, data):
-        return utils._get_lang_code(data)
-
-    def get_lang_name(self, data):
-        return utils._get_lang_name(data)
-
-    def get_all_lang_codes(self):
-        for code in consts.LANG_CODES.iterkeys():
-            yield code
 
     def translate(self, text, dest, src, _update_on_hdd=True):
 
@@ -157,6 +149,8 @@ class Translator(translator_abstract.TranslatorAbstract):
             fragment=base_url.fragment
         ).url
 
+        if self.FORCE_RPM is not None:
+            current_session.FORCE_RPM = self.FORCE_RPM
         request = current_session.get(url)
         self.LOGGER.debug("Answer:\n%s", request.content)
         _json = request.json()

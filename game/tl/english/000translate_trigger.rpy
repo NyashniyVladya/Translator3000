@@ -304,3 +304,11 @@ translate english strings:
     old "Поддержать разработчика."
     new "Support the developer."
 
+# TODO: Translation updated at 2022-02-06 04:30
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:20
+    old "Для этого сервиса перевода частота фиксированная."
+    new "For this translation service, the frequency of requests is unchangeable."
+

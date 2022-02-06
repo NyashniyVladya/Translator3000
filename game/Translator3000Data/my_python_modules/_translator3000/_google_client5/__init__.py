@@ -4,4 +4,4 @@
 """
 
 from .. import LOGGER as _parent_logger
-LOGGER = _parent_logger.getChild("Google")
+LOGGER = _parent_logger.getChild("Google (client5)")

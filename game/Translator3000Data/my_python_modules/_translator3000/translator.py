@@ -3,13 +3,22 @@
 @author: Vladya
 """
 
-from ._google import translator as google_translator
+from ._google_gtx import translator as google_gtx_translator
+from ._google_client5 import translator as google_client5_translator
 
 
 class Translator(object):
 
     CLASSES = {
-        "google": google_translator.Translator
+        "google_gtx": google_gtx_translator.Translator,
+        "google_client5": google_client5_translator.Translator,
+    }
+
+    alias_mapping = {
+        #  For backward compatibility with the settings in the file.
+        "google_client5": (
+            "google",
+        )
     }
 
     def __init__(self):
@@ -25,7 +34,12 @@ class Translator(object):
 
         _service = service.strip().lower()
         if _service not in self.__translators:
-            raise ValueError("Translator \"{0}\" not found".format(service))
+            for new_name, aliases in self.alias_mapping.iteritems():
+                if _service in aliases:
+                    _service = new_name.strip().lower()
+                    break
+            if _service not in self.__translators:
+                raise ValueError("Translator '{0}' not found".format(service))
 
         return self.__translators[_service]
 

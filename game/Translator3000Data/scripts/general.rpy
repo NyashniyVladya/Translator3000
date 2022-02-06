@@ -374,7 +374,11 @@ init -7 python in _translator3000:
             if not hasattr(entry_object, "translator3000_original_what"):
                 for k, v in self._original_mapping.copy().iteritems():
                     if entry_object.what in (k, v):
-                        entry_object.translator3000_original_what = v
+                        try:
+                            text = self.unquote(v)
+                        except Exception:
+                            text = v
+                        entry_object.translator3000_original_what = text
                         break
                 else:
                     return

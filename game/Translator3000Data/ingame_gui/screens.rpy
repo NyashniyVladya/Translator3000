@@ -397,19 +397,22 @@ init -38:
                     )
             vbox:
                 label translator3000._gui.translate("Частота запросов.")
-                if translator3000._setting["requestsFrequency"] is None:
-                    text translator3000._gui.translate("Не установлено.")
+                if translator3000._translator_object._get_translator(translator3000._setting["translationService"]).FORCE_RPM is not None:
+                    text translator3000._gui.translate("Для этого сервиса перевода частота фиксированная.")
                 else:
-                    text translator3000._gui.translate("{0:.0f} запросов в минуту.").format(
-                        float(translator3000._setting["requestsFrequency"])
+                    if translator3000._setting["requestsFrequency"] is None:
+                        text translator3000._gui.translate("Не установлено.")
+                    else:
+                        text translator3000._gui.translate("{0:.0f} запросов в минуту.").format(
+                            float(translator3000._setting["requestsFrequency"])
+                        )
+                    bar value FieldValue(
+                        translator3000._gui,
+                        "requests_frequency_pref",
+                        offset=10.,
+                        range=500.,
+                        step=.01
                     )
-                bar value FieldValue(
-                    translator3000._gui,
-                    "requests_frequency_pref",
-                    offset=10.,
-                    range=500.,
-                    step=.01
-                )
 
     screen translator3000_github_update:
 
