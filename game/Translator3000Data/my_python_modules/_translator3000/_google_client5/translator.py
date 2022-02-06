@@ -3,7 +3,6 @@
 @author: Vladya
 """
 
-import urllib
 from os import path
 from .. import (
     translator_abstract,
@@ -23,7 +22,7 @@ except ImportError:
 
 class Translator(translator_abstract.TranslatorAbstract):
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     TRANSLATOR_NAME = "google"
 
@@ -59,7 +58,7 @@ class Translator(translator_abstract.TranslatorAbstract):
             "client": "dict-chrome-ex",
             "sl": src,
             "tl": dest,
-            "q": text.encode("utf_8", "ignore")
+            "q": text
         }
 
         base_url = self.get_base_url()
@@ -69,7 +68,7 @@ class Translator(translator_abstract.TranslatorAbstract):
             host=base_url.host,
             port=base_url.port,
             path=base_url.path,
-            query=urllib.urlencode(params),
+            query=self._urlencode(params),
             fragment=base_url.fragment
         ).url
 

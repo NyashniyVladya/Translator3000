@@ -6,6 +6,7 @@
 import os
 import json
 import copy
+import urllib
 import threading
 from os import path
 from . import (
@@ -18,7 +19,7 @@ from . import (
 class TranslatorAbstract(object):
 
     __author__ = "Vladya"
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
 
     LOGGER = None
     DATABASE_FN = None
@@ -68,6 +69,22 @@ class TranslatorAbstract(object):
                 self._local_db.update(copy.deepcopy(_local_database))
 
         self.backup_database()
+
+    @staticmethod
+    def _urlencode(param_dict, space_is_plus=False):
+
+        quote_func = (urllib.quote_plus if space_is_plus else urllib.quote)
+
+        query = set()
+        for k, v in param_dict.iteritems():
+            if isinstance(k, unicode):
+                k = k.encode("utf_8", "ignore")
+            if isinstance(v, unicode):
+                v = v.encode("utf_8", "ignore")
+            k, v = map(quote_func, map(str, (k, v)))
+            query.add("{}={}".format(k, v))
+
+        return '&'.join(sorted(query))
 
     def backup_database(self):
 
