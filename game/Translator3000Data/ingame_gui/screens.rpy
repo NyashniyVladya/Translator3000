@@ -36,13 +36,17 @@ init -38:
 
         tag translator3000_screen
         style_prefix "translator3000"
-
+        
         key "alt_K_BACKQUOTE" action ToggleField(translator3000._gui, "show")
 
         if translator3000._translator_switcher:
             $ state = "Приостановить перевод."
         else:
             $ state = "Возобновить перевод."
+            
+        $ patreon_pic_zoom = .05
+        $ discord_pic_zoom = (((1080. - (71. * 2.)) / 470.) * patreon_pic_zoom)
+            
 
         use translator3000_base_vbox_in_window:
             textbutton "Translator3000. {0}".format(
@@ -52,6 +56,25 @@ init -38:
                 text_hover_color "#888"
                 text_selected_outlines [(2, "#000", 0, 0), (1, "#050", 0, 0)]
                 action OpenURL("https://www.patreon.com/NyashniyVladya")
+
+            hbox:
+                xanchor .0
+                xpos .006
+                xfill False
+                spacing 10
+
+                imagebutton:
+                    yalign .5
+                    idle Transform("Translator3000OtherFiles/Digital-Patreon-Logo_FieryCoral.png", zoom=patreon_pic_zoom)
+                    hover Transform("Translator3000OtherFiles/Digital-Patreon-Logo_Black.png", zoom=(patreon_pic_zoom * 1.2))
+                    action OpenURL("https://www.patreon.com/bePatron?u=62209932")
+
+                imagebutton:
+                    yalign .5
+                    idle Transform("Translator3000OtherFiles/icon_clyde_blurple_RGB.png", zoom=discord_pic_zoom)
+                    hover Transform("Translator3000OtherFiles/icon_clyde_black_RGB.png", zoom=(discord_pic_zoom * 1.2))
+                    action OpenURL("https://discord.gg/Mrb23VQyCR")
+
             textbutton translator3000._gui.translate(state):
                 action ToggleField(
                     translator3000,
@@ -74,7 +97,7 @@ init -38:
 
             null height 10
             textbutton translator3000._gui.translate("Поддержать разработчика."):
-                action OpenURL("https://www.patreon.com/NyashniyVladya")
+                action OpenURL("https://www.patreon.com/bePatron?u=62209932")
 
             null height 10
             use translator3000_github_update

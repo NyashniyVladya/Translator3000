@@ -312,3 +312,10 @@ translate english strings:
     old "Для этого сервиса перевода частота фиксированная."
     new "For this translation service, the frequency of requests is unchangeable."
 
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:12
+    old "Версия {0}."
+    new "Version {0}."
+
