@@ -75,6 +75,11 @@ init -38:
                     hover Transform("Translator3000OtherFiles/icon_clyde_black_RGB.png", zoom=(discord_pic_zoom * 1.2))
                     action OpenURL("https://discord.gg/Mrb23VQyCR")
 
+            null height 10
+            textbutton translator3000._gui.translate("На Patreon уже доступна новая версия переводчика."):
+                action OpenURL("https://www.patreon.com/NyashniyVladya")
+            null height 10
+
             textbutton translator3000._gui.translate(state):
                 action ToggleField(
                     translator3000,

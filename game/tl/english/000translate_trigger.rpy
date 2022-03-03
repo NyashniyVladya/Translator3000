@@ -319,3 +319,11 @@ translate english strings:
     old "Версия {0}."
     new "Version {0}."
 
+# TODO: Translation updated at 2022-03-03 20:54
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:36
+    old "На Patreon уже доступна новая версия переводчика."
+    new "A new version of the translator is already available on Patreon."
+
