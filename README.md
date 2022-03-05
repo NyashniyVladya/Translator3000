@@ -2,7 +2,7 @@
 
 ### Automatic translator of games made on Ren'Py engine.
 
-<a href="https://www.patreon.com/bePatron?u=62209932"><img src="https://user-images.githubusercontent.com/19994753/154846762-2cd02dfb-a281-4d30-806a-45bd199001eb.png" height="57" alt="Support developer"/></a> <a href="https://discord.gg/Mrb23VQyCR"><img src="https://user-images.githubusercontent.com/19994753/154846983-4c1294dd-e000-4c87-94fa-ac4943f6bd2f.png" height="50" alt="Join a Discord Server"/></a>
+<a href="https://www.patreon.com/bePatron?u=62209932"><img src="https://user-images.githubusercontent.com/19994753/154846762-2cd02dfb-a281-4d30-806a-45bd199001eb.png" height="57" alt="Support developer"/></a> <a href="https://discord.gg/FqsQXNH6Fg"><img src="https://user-images.githubusercontent.com/19994753/154846983-4c1294dd-e000-4c87-94fa-ac4943f6bd2f.png" height="50" alt="Join a Discord Server"/></a>
 
 [Instruction manual and compiled *.rpa* file for use in games.](https://github.com/NyashniyVladya/Translator3000/releases)
 
@@ -93,4 +93,4 @@
 
 [Support me on Patreon.](https://www.patreon.com/bePatron?u=62209932)
 
-[Join a Discord server.](https://discord.gg/Mrb23VQyCR)
+[Join a Discord server.](https://discord.gg/FqsQXNH6Fg)
