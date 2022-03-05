@@ -73,7 +73,7 @@ init -38:
                     yalign .5
                     idle Transform("Translator3000OtherFiles/icon_clyde_blurple_RGB.png", zoom=discord_pic_zoom)
                     hover Transform("Translator3000OtherFiles/icon_clyde_black_RGB.png", zoom=(discord_pic_zoom * 1.2))
-                    action OpenURL("https://discord.gg/Mrb23VQyCR")
+                    action OpenURL("https://discord.gg/FqsQXNH6Fg")
 
             null height 10
             textbutton translator3000._gui.translate("На Patreon уже доступна новая версия переводчика."):
