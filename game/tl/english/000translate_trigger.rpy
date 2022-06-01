@@ -327,3 +327,31 @@ translate english strings:
     old "На Patreon уже доступна новая версия переводчика."
     new "A new version of the translator is already available on Patreon."
 
+# TODO: Translation updated at 2022-06-01 02:30
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:36
+    old "На Boosty уже доступна новая версия переводчика."
+    new "A new version of the translator is already available on Boosty."
+
+    # game/000translate_trigger.rpy:37
+    old "На Patreon и Boosty уже доступна новая версия переводчика."
+    new "A new version of the translator is already available on Patreon and Boosty."
+
+    # game/000translate_trigger.rpy:50
+    old "Ознакомительная версия."
+    new "Trial version."
+
+    # game/000translate_trigger.rpy:58
+    old "Поддержать разработчика через Boosty."
+    new "Support the developer with Boosty."
+
+    # game/000translate_trigger.rpy:59
+    old "Поддержать разработчика через Patreon."
+    new "Support the developer with Patreon."
+
+    # game/000translate_trigger.rpy:65
+    old "Присоединиться к Discord сообществу."
+    new "Join Discord community."
+

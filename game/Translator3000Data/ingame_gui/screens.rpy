@@ -43,20 +43,20 @@ init -38:
             $ state = "Приостановить перевод."
         else:
             $ state = "Возобновить перевод."
-            
+
         $ patreon_pic_zoom = .05
+        $ boosty_pic_zoom = ((1080. / 788.) * patreon_pic_zoom)
         $ discord_pic_zoom = (((1080. - (71. * 2.)) / 470.) * patreon_pic_zoom)
-            
 
         use translator3000_base_vbox_in_window:
-            textbutton "Translator3000. {0}".format(
-                translator3000._gui.translate("Версия {0}.{1}.{2}.")
+            textbutton "Translator3000. {0}\n{1}".format(
+                translator3000._gui.translate("Версия {0}.{1}.{2}."),
+                translator3000._gui.translate("Ознакомительная версия."),
             ).format(*_translator3000.VERSION):
                 text_style "translator3000_label_text"
                 text_hover_color "#888"
                 text_selected_outlines [(2, "#000", 0, 0), (1, "#050", 0, 0)]
                 action OpenURL("https://www.patreon.com/NyashniyVladya")
-
             hbox:
                 xanchor .0
                 xpos .006
@@ -65,19 +65,25 @@ init -38:
 
                 imagebutton:
                     yalign .5
+                    idle Transform("Translator3000OtherFiles/BoostyColor.png", zoom=boosty_pic_zoom)
+                    hover Transform("Translator3000OtherFiles/BoostyDark.png", zoom=boosty_pic_zoom)
+                    action OpenURL("https://boosty.to/nyashniyvladya")
+
+                imagebutton:
+                    yalign .5
                     idle Transform("Translator3000OtherFiles/Digital-Patreon-Logo_FieryCoral.png", zoom=patreon_pic_zoom)
-                    hover Transform("Translator3000OtherFiles/Digital-Patreon-Logo_Black.png", zoom=(patreon_pic_zoom * 1.2))
+                    hover Transform("Translator3000OtherFiles/Digital-Patreon-Logo_Black.png", zoom=patreon_pic_zoom)
                     action OpenURL("https://www.patreon.com/bePatron?u=62209932")
 
                 imagebutton:
                     yalign .5
                     idle Transform("Translator3000OtherFiles/icon_clyde_blurple_RGB.png", zoom=discord_pic_zoom)
-                    hover Transform("Translator3000OtherFiles/icon_clyde_black_RGB.png", zoom=(discord_pic_zoom * 1.2))
+                    hover Transform("Translator3000OtherFiles/icon_clyde_black_RGB.png", zoom=discord_pic_zoom)
                     action OpenURL("https://discord.gg/FqsQXNH6Fg")
 
             null height 10
-            textbutton translator3000._gui.translate("На Patreon уже доступна новая версия переводчика."):
-                action OpenURL("https://www.patreon.com/NyashniyVladya")
+            textbutton translator3000._gui.translate("На Patreon и Boosty уже доступна новая версия переводчика."):
+                action OpenURL("https://boosty.to/nyashniyvladya")
             null height 10
 
             textbutton translator3000._gui.translate(state):
@@ -101,10 +107,14 @@ init -38:
                 action translator3000._gui.ForwardAction("translator3000_user_preferences")
 
             null height 10
-            textbutton translator3000._gui.translate("Поддержать разработчика."):
+            textbutton translator3000._gui.translate("Поддержать разработчика через Boosty."):
+                action OpenURL("https://boosty.to/nyashniyvladya")
+            textbutton translator3000._gui.translate("Поддержать разработчика через Patreon."):
                 action OpenURL("https://www.patreon.com/bePatron?u=62209932")
-
+            textbutton translator3000._gui.translate("Присоединиться к Discord сообществу."):
+                action OpenURL("https://discord.gg/FqsQXNH6Fg")
             null height 10
+
             use translator3000_github_update
             null height 10
             use translator3000_prescan_status
