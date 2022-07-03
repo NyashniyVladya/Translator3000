@@ -146,48 +146,43 @@ class TranslatorAbstract(object):
         if len(_text_for_log) >= 100:
             _text_for_log = u"{0}...".format(_text_for_log[:96].strip())
 
-        with self._database_lock:
+        self.LOGGER.debug(
+            "Start translating \"%s\" from %s to %s.",
+            _text_for_log.encode("utf_8", "ignore"),
+            self.get_lang_name(src).lower(),
+            self.get_lang_name(dest).lower()
+        )
 
-            self.LOGGER.debug(
-                "Start translating \"%s\" from %s to %s.",
-                _text_for_log.encode("utf_8", "ignore"),
-                self.get_lang_name(src).lower(),
-                self.get_lang_name(dest).lower()
-            )
+        _lang_db = self._database.setdefault(src, {})
+        _text_db = _lang_db.setdefault(text, {})
 
-            _lang_db = self._database.setdefault(src, {})
-            _text_db = _lang_db.setdefault(text, {})
-
-            if dest in _text_db:
-                result = _text_db[dest]
-                self.add_translate_to_local_database(
-                    text,
-                    dest,
-                    src,
-                    result,
-                    _update_on_hdd
-                )
-                self.LOGGER.debug("Translation is available in database.")
-                return result
-
-            self.LOGGER.debug("Translation is not available in database.")
-
-            result = self._web_translate(text, dest, src)
-            self.LOGGER.debug("Successfully translated.")
-
-            _text_db[dest] = result
+        if dest in _text_db:
+            result = _text_db[dest]
             self.add_translate_to_local_database(
                 text,
                 dest,
                 src,
                 result,
-                False
+                _update_on_hdd
             )
-
-            if _update_on_hdd:
-                self.backup_database()
-
+            self.LOGGER.debug("Translation is available in database.")
             return result
+
+        self.LOGGER.debug("Translation is not available in database.")
+
+        result = self._web_translate(text, dest, src)
+        self.LOGGER.debug("Successfully translated.")
+
+        _text_db[dest] = result
+        self.add_translate_to_local_database(
+            text,
+            dest,
+            src,
+            result,
+            _update_on_hdd
+        )
+
+        return result
 
     def add_translate_to_local_database(self, text, dest, src, tr, _upd=True):
 
