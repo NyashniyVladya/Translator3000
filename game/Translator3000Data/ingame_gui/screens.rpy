@@ -56,7 +56,7 @@ init -38:
                 text_style "translator3000_label_text"
                 text_hover_color "#888"
                 text_selected_outlines [(2, "#000", 0, 0), (1, "#050", 0, 0)]
-                action OpenURL("https://www.patreon.com/NyashniyVladya")
+                action OpenURL("https://boosty.to/nyashniyvladya")
             hbox:
                 xanchor .0
                 xpos .006
@@ -69,11 +69,12 @@ init -38:
                     hover Transform("Translator3000OtherFiles/BoostyDark.png", zoom=boosty_pic_zoom)
                     action OpenURL("https://boosty.to/nyashniyvladya")
 
-                imagebutton:
-                    yalign .5
-                    idle Transform("Translator3000OtherFiles/Digital-Patreon-Logo_FieryCoral.png", zoom=patreon_pic_zoom)
-                    hover Transform("Translator3000OtherFiles/Digital-Patreon-Logo_Black.png", zoom=patreon_pic_zoom)
-                    action OpenURL("https://www.patreon.com/bePatron?u=62209932")
+                if _translator3000.PATREON_IS_ACTIVE:
+                    imagebutton:
+                        yalign .5
+                        idle Transform("Translator3000OtherFiles/Digital-Patreon-Logo_FieryCoral.png", zoom=patreon_pic_zoom)
+                        hover Transform("Translator3000OtherFiles/Digital-Patreon-Logo_Black.png", zoom=patreon_pic_zoom)
+                        action OpenURL("https://www.patreon.com/bePatron?u=62209932")
 
                 imagebutton:
                     yalign .5
@@ -82,7 +83,11 @@ init -38:
                     action OpenURL("https://discord.gg/FqsQXNH6Fg")
 
             null height 10
-            textbutton translator3000._gui.translate("На Patreon и Boosty уже доступна новая версия переводчика."):
+            if _translator3000.PATREON_IS_ACTIVE:
+                $ new_ver_text = "На Patreon и Boosty уже доступна новая версия переводчика."
+            else:
+                $ new_ver_text = "На Boosty уже доступна новая версия переводчика."
+            textbutton translator3000._gui.translate(new_ver_text):
                 action OpenURL("https://boosty.to/nyashniyvladya")
             null height 10
 
@@ -109,8 +114,9 @@ init -38:
             null height 10
             textbutton translator3000._gui.translate("Поддержать разработчика через Boosty."):
                 action OpenURL("https://boosty.to/nyashniyvladya")
-            textbutton translator3000._gui.translate("Поддержать разработчика через Patreon."):
-                action OpenURL("https://www.patreon.com/bePatron?u=62209932")
+            if _translator3000.PATREON_IS_ACTIVE:
+                textbutton translator3000._gui.translate("Поддержать разработчика через Patreon."):
+                    action OpenURL("https://www.patreon.com/bePatron?u=62209932")
             textbutton translator3000._gui.translate("Присоединиться к Discord сообществу."):
                 action OpenURL("https://discord.gg/FqsQXNH6Fg")
             null height 10

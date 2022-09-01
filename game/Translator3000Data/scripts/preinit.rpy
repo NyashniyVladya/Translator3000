@@ -25,3 +25,7 @@ init -50 python in translator3000_preinit:
 
     if renpy.version(True) < (7, 4, 0):
         renpy.config.search_prefixes.append("old_requests_module/")
+
+init -49 python in _translator3000:
+
+    PATREON_IS_ACTIVE = False
