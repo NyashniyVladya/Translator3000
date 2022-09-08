@@ -30,8 +30,9 @@ init python in archiver:
     import glob
     import zlib
 
-    from pickle import dumps, HIGHEST_PROTOCOL
+    from pickle import dumps
 
+    PICKLE_PROTOCOL = 2
 
     class Archive(object):
         """
@@ -77,7 +78,7 @@ init python in archiver:
 
             indexoff = self.f.tell()
 
-            self.f.write(zlib.compress(dumps(self.index, HIGHEST_PROTOCOL)))
+            self.f.write(zlib.compress(dumps(self.index, PICKLE_PROTOCOL)))
 
             self.f.seek(0)
             self.f.write(b"RPA-3.0 %016x %08x\n" % (indexoff, self.key))
