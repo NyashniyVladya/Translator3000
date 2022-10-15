@@ -19,7 +19,13 @@
 
 [Instruction manual and compiled *.rpa* file for use in games.](https://github.com/NyashniyVladya/Translator3000/releases)
 
+
 *Works in games made on Ren'Py 6.99.12.4 and newer.*
+
+***The trial version supports Ren'Py versions up to 7.5.***
+
+***Support for Ren'Py 8 is already implemented in the [main version](https://boosty.to/nyashniyvladya).***
+
 
 <br>
 
