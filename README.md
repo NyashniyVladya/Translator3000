@@ -20,8 +20,7 @@
 
 <br>
 
-[Instruction manual and compiled *.rpa* file for use in games.](https://github.com/NyashniyVladya/Translator3000/releases)
-
+[Instruction manual and compiled *.rpa* file for use in games.](https://github.com/NyashniyVladya/Translator3000/releases/latest)
 
 *Works in games made on Ren'Py 6.99.12.4 and newer.*
 
