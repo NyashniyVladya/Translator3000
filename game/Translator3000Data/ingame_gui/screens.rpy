@@ -36,7 +36,7 @@ init -38:
 
         tag translator3000_screen
         style_prefix "translator3000"
-        
+
         key "alt_K_BACKQUOTE" action ToggleField(translator3000._gui, "show")
 
         if translator3000._translator_switcher:
@@ -74,7 +74,7 @@ init -38:
                         yalign .5
                         idle Transform("Translator3000OtherFiles/Digital-Patreon-Logo_FieryCoral.png", zoom=patreon_pic_zoom)
                         hover Transform("Translator3000OtherFiles/Digital-Patreon-Logo_Black.png", zoom=patreon_pic_zoom)
-                        action OpenURL("https://www.patreon.com/bePatron?u=62209932")
+                        action OpenURL("https://www.patreon.com/join/NyashniyVladya")
 
                 imagebutton:
                     yalign .5
@@ -116,7 +116,7 @@ init -38:
                 action OpenURL("https://boosty.to/nyashniyvladya")
             if _translator3000.PATREON_IS_ACTIVE:
                 textbutton translator3000._gui.translate("Поддержать разработчика через Patreon."):
-                    action OpenURL("https://www.patreon.com/bePatron?u=62209932")
+                    action OpenURL("https://www.patreon.com/join/NyashniyVladya")
             textbutton translator3000._gui.translate("Присоединиться к Discord сообществу."):
                 action OpenURL("https://discord.gg/FqsQXNH6Fg")
             null height 10

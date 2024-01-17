@@ -28,4 +28,4 @@ init -50 python in translator3000_preinit:
 
 init -49 python in _translator3000:
 
-    PATREON_IS_ACTIVE = False
+    PATREON_IS_ACTIVE = True

@@ -6,13 +6,14 @@
 
 <div id="imageLinks" align="left">
     <a href="https://boosty.to/nyashniyvladya"><img src="https://user-images.githubusercontent.com/19994753/171388249-2dd82009-e065-4435-af0b-5b198478cedb.png" height="50" alt="Support with Boosty"/></a>
+    <a href="https://www.patreon.com/join/NyashniyVladya"><img src="https://user-images.githubusercontent.com/19994753/154846762-2cd02dfb-a281-4d30-806a-45bd199001eb.png" height="55" alt="Support with Patreon"/></a>
     <a href="https://discord.gg/FqsQXNH6Fg"><img src="https://user-images.githubusercontent.com/19994753/154846983-4c1294dd-e000-4c87-94fa-ac4943f6bd2f.png" height="50" alt="Join Discord community"/></a>
 </div>
 
 <br>
 
 <a href="https://boosty.to/nyashniyvladya"><img src="https://user-images.githubusercontent.com/19994753/171388249-2dd82009-e065-4435-af0b-5b198478cedb.png" height="15" alt="Support with Boosty"/></a> [Download main version from Boosty](https://boosty.to/nyashniyvladya)
-
+<a href="https://www.patreon.com/bePatron?u=62209932"><img src="https://user-images.githubusercontent.com/19994753/154846762-2cd02dfb-a281-4d30-806a-45bd199001eb.png" height="15" alt="Support with Patreon"/></a> [Download main version from Patreon](https://www.patreon.com/join/NyashniyVladya)
 <a href="https://discord.gg/FqsQXNH6Fg"><img src="https://user-images.githubusercontent.com/19994753/154846983-4c1294dd-e000-4c87-94fa-ac4943f6bd2f.png" height="15" alt="Join Discord community"/></a> [Join Discord community](https://discord.gg/FqsQXNH6Fg)
 
 <br>
