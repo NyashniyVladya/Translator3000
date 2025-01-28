@@ -221,6 +221,6 @@ init 10 python in _build_creator:
                 if path.isfile(self.f.name):
                     os.remove(self.f.name)
                 raise ex_type(
-                    __("Сборка неудачна.\n{0}").format(ex_value.message)
+                    __("Сборка неудачна.\n{0}").format(*ex_value.args)
                 )
             self.close()
