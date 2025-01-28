@@ -145,12 +145,6 @@ init 10 python in _build_creator:
                 exts=(".py",)
             ),
             PackingData(
-                renpy_name="Translator3000Data/requests_module",
-                pack_name="old_requests_module",
-                _type="folder",
-                exts=(".pem", ".py")
-            ),
-            PackingData(
                 renpy_name="Translator3000Data/scripts",
                 pack_name="Translator3000Scripts",
                 _type="folder",
