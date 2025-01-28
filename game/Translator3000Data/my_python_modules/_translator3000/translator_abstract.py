@@ -6,7 +6,7 @@
 import os
 import json
 import copy
-import urllib
+import requests.compat
 import threading
 from os import path
 from . import (
@@ -73,7 +73,9 @@ class TranslatorAbstract(object):
     @staticmethod
     def _urlencode(param_dict, space_is_plus=False):
 
-        quote_func = (urllib.quote_plus if space_is_plus else urllib.quote)
+        quote_func = requests.compat.quote
+        if space_is_plus:
+            quote_func = requests.compat.quote_plus
 
         query = set()
         for k, v in param_dict.items():

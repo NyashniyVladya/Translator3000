@@ -35,7 +35,7 @@ init -8 python in _translator3000:
             Перезапуск скана.
             Например, если были сменены направления перевода.
             """
-            self.LOGGER.debug(b"Restart of prescan thread has been requested.")
+            self.LOGGER.debug("Restart of prescan thread has been requested.")
             self.__need_restart = True
 
         def get_info(self):
@@ -92,7 +92,7 @@ init -8 python in _translator3000:
                 text_len = len(say_objects)
 
                 try:
-                    self.LOGGER.debug(b"Prescan thread is started.")
+                    self.LOGGER.debug("Prescan thread is started.")
                     for counter, say_node in enumerate(say_objects):
 
                         while True:
@@ -119,7 +119,7 @@ init -8 python in _translator3000:
                                 _force=True
                             )
                         except Exception as ex:
-                            self.LOGGER.exception(ex.message)
+                            self.LOGGER.error(ex.args[0])
                             self.__last_exception = ex
                             continue
                 finally:
@@ -127,4 +127,4 @@ init -8 python in _translator3000:
                     self.__status = None
                     self.__completed = True
                     renpy.restart_interaction()
-                    self.LOGGER.debug(b"Pre-scan is complete.")
+                    self.LOGGER.debug("Pre-scan is complete.")

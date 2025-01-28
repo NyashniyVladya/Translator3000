@@ -10,6 +10,7 @@ init -10 python in _translator3000:
     import os
     import pickle
     import logging
+    import urllib3
     import requests
     import threading
     import json
@@ -30,12 +31,7 @@ init -10 python in _translator3000:
         _paths
     )
 
-    if renpy.version(True) >= (7, 4, 0):
-        import urllib3
-    else:
-        from requests.packages import urllib3
-
-    VERSION = (2, 10, 10)
+    VERSION = (2, 10, 11)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))

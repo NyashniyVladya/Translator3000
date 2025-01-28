@@ -125,17 +125,19 @@ class WebHandler(requests.Session):
                         *args,
                         **kwargs
                     )
-                except Exception as _last_exception:
+                except Exception as ex:
                     #  Request was not sent. Do not update time.
-                    self.LOGGER.error(_last_exception.message)
+                    self.LOGGER.error(ex.args[0])
+                    _last_exception = ex
                     continue
                 else:
                     #  Request was sent. Update time and check HTTP errors.
                     host_object._last_request = time.time()
                     try:
                         result.raise_for_status()
-                    except Exception as _last_exception:
-                        self.LOGGER.error(_last_exception.message)
+                    except Exception as ex:
+                        self.LOGGER.error(ex.args[0])
+                        _last_exception = ex
                         continue
                     else:
                         self.LOGGER.debug(

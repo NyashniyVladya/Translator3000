@@ -68,13 +68,13 @@ class Translator(translator_abstract.TranslatorAbstract):
             host=base_url.host,
             port=base_url.port,
             path=base_url.path,
-            query=self._urlencode(params),
+            query=None,
             fragment=base_url.fragment
         ).url
 
         if self.FORCE_RPM is not None:
             current_session.FORCE_RPM = self.FORCE_RPM
-        request = current_session.get(url)
+        request = current_session.get(url, params=params)
         self.LOGGER.debug("Answer:\n%s", request.content)
         _json = request.json()
         if isinstance(_json, dict):
