@@ -140,17 +140,17 @@ init -7 python in _translator3000:
                 if isinstance(text_self, renpy.display.behavior.Input):
                     _translate = False
 
-                if not isinstance(text, __builtin__.list):
+                if not isinstance(text, builtins.list):
                     text = [text]
 
                 new_text = []
                 for t in text:
 
-                    if not isinstance(t, basestring):
+                    if not isinstance(t, (bytes, str)):
                         new_text.append(t)
                         continue
 
-                    if not isinstance(t, unicode):
+                    if not isinstance(t, str):
                         t = t.decode("utf_8", "replace")
 
                     _first_mark = "###notTranslate###"
@@ -182,7 +182,7 @@ init -7 python in _translator3000:
                     update
                 )
 
-            return types.MethodType(set_text, None, renpy.text.text.Text)
+            return set_text
 
         def update_work_method(self):
 
@@ -311,10 +311,10 @@ init -7 python in _translator3000:
             Возвращает булевое значение - был ли обновлён словарь.
             """
 
-            _dict = __builtin__.dict
+            _dict = builtins.dict
 
             updated = False
-            for k, v in default.iteritems():
+            for k, v in default.items():
 
                 if k not in dct:
                     dct[k] = copy.deepcopy(v)
@@ -372,7 +372,7 @@ init -7 python in _translator3000:
         def _history_callback(self, entry_object):
 
             if not hasattr(entry_object, "translator3000_original_what"):
-                for k, v in self._original_mapping.copy().iteritems():
+                for k, v in self._original_mapping.copy().items():
                     if entry_object.what in (k, v):
                         try:
                             text = self.unquote(v)
@@ -391,7 +391,7 @@ init -7 python in _translator3000:
         def _dump_setting(self):
 
             _backup = json.dumps(self._setting, ensure_ascii=False, indent=4)
-            if isinstance(_backup, unicode):
+            if isinstance(_backup, str):
                 _backup = _backup.encode("utf_8")
             utils.save_data_to_file(_backup, self._user_setting_file)
 
@@ -459,7 +459,7 @@ init -7 python in _translator3000:
                 force=True,
                 translate=False
             )
-            if isinstance(s, basestring):
+            if isinstance(s, (bytes, str)):
                 return s
             return s[0]
 
@@ -488,7 +488,7 @@ init -7 python in _translator3000:
             """
             Экранирует спецсимволы ренпая, такие как '{', '[', '%'.
             """
-            for old, new in {'{': "{{", '[': "[[", '%': "%%"}.iteritems():
+            for old, new in {'{': "{{", '[': "[[", '%': "%%"}.items():
                 s = s.replace(old, new)
             return s
 

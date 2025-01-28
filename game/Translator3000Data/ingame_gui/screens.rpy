@@ -119,6 +119,8 @@ init -38:
                     action OpenURL("https://www.patreon.com/join/NyashniyVladya")
             textbutton translator3000._gui.translate("Присоединиться к Discord сообществу."):
                 action OpenURL("https://discord.gg/FqsQXNH6Fg")
+            textbutton translator3000._gui.translate("Вступить в группу в Telegram."):
+                action OpenURL("https://t.me/translator3000")
             null height 10
 
             use translator3000_github_update
@@ -221,7 +223,7 @@ init -38:
             if from_game == "from_database":
 
                 for fnt in reversed(
-                    tuple(translator3000._multi_persistent.fonts.iterkeys())
+                    tuple(translator3000._multi_persistent.fonts.keys())
                 ):
                     textbutton "{{#notTranslate}}{0}".format(translator3000.quote(translator3000._gui._fs_object.get_clear_filename(fnt))):
                         action Function(
@@ -303,7 +305,7 @@ init -38:
                         size 30
                 vbox:
                     for _mod in "+-":
-                        $ _false = unicode(translator3000._gui._text_size_without_mod)
+                        $ _false = str(translator3000._gui._text_size_without_mod)
                         $ _true = "{0}{1}".format(_mod, _false)
                         textbutton "{{#notTranslate}}{0}".format(_mod):
                             text_size 30
@@ -418,6 +420,15 @@ init -38:
                             SetDict(translator3000._setting, "translationService", srv),
                             translator3000._gui.ApplySettingAction(True)
                         )
+                for srv in ("google_rpc", "selenium_deepl", "yandex_translate", "reverso"):
+                    textbutton "{{#notTranslate}}{0}".format(translator3000.quote(srv.title())):
+                        action translator3000._gui.FunctionPlaceholderAction()
+
+            vbox:
+                label translator3000._gui.translate("Дополнительные функции.")
+                textbutton translator3000._gui.translate("Редактировать комбинации клавиш."):
+                    action translator3000._gui.FunctionPlaceholderAction()
+
 
             vbox:
                 label translator3000._gui.translate("Способ работы переводчика.")

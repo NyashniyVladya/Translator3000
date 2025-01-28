@@ -84,7 +84,7 @@ init -8 python in _translator3000:
                     sorted(
                         map(
                             lambda tl: tl.predict()[0],
-                            _renpy_translator.default_translates.itervalues()
+                            _renpy_translator.default_translates.values()
                         ),
                         key=lambda _node: (_node.filename, _node.linenumber)
                     )
@@ -110,7 +110,7 @@ init -8 python in _translator3000:
                             self._translator.backup_database()
                         if not hasattr(say_node, "what"):
                             continue
-                        if not isinstance(say_node.what, basestring):
+                        if not isinstance(say_node.what, (bytes, str)):
                             continue
                         try:
                             self._translator(

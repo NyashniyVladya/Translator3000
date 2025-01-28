@@ -8,6 +8,7 @@
     <a href="https://boosty.to/nyashniyvladya"><img src="https://user-images.githubusercontent.com/19994753/171388249-2dd82009-e065-4435-af0b-5b198478cedb.png" height="50" alt="Support with Boosty"/></a>
     <a href="https://www.patreon.com/join/NyashniyVladya"><img src="https://user-images.githubusercontent.com/19994753/154846762-2cd02dfb-a281-4d30-806a-45bd199001eb.png" height="55" alt="Support with Patreon"/></a>
     <a href="https://discord.gg/FqsQXNH6Fg"><img src="https://user-images.githubusercontent.com/19994753/154846983-4c1294dd-e000-4c87-94fa-ac4943f6bd2f.png" height="50" alt="Join Discord community"/></a>
+    <a href="https://t.me/translator3000"><img src="https://github.com/user-attachments/assets/739948e9-7300-4f38-8daf-9047cc65930b" height="50" alt="Join Telegram group"/></a>
 </div>
 
 <br>
@@ -17,16 +18,16 @@
 <a href="https://www.patreon.com/bePatron?u=62209932"><img src="https://user-images.githubusercontent.com/19994753/154846762-2cd02dfb-a281-4d30-806a-45bd199001eb.png" height="15" alt="Support with Patreon"/></a> [Download main version from Patreon](https://www.patreon.com/join/NyashniyVladya)
 <br>
 <a href="https://discord.gg/FqsQXNH6Fg"><img src="https://user-images.githubusercontent.com/19994753/154846983-4c1294dd-e000-4c87-94fa-ac4943f6bd2f.png" height="15" alt="Join Discord community"/></a> [Join Discord community](https://discord.gg/FqsQXNH6Fg)
+<br>
+<a href="https://t.me/translator3000"><img src="https://github.com/user-attachments/assets/739948e9-7300-4f38-8daf-9047cc65930b" height="15" alt="Join Telegram group"/></a> [Join Telegram group](https://t.me/translator3000)
 
 <br>
 
 [Instruction manual and compiled *.rpa* file for use in games.](https://github.com/NyashniyVladya/Translator3000/releases/latest)
 
-*Works in games made on Ren'Py 6.99.12.4 and newer.*
+*Works in games made on Ren'Py 8.0.3 and newer.*
 
-***The trial version supports Ren'Py versions up to 7.5.***
-
-***Support for Ren'Py 8 is already implemented in the [main version](https://boosty.to/nyashniyvladya).***
+***Support for other Ren'Py version is already implemented in the [main version](https://boosty.to/nyashniyvladya).***
 
 
 <br>

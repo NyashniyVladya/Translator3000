@@ -110,10 +110,10 @@ init -9 python in _translator3000:
                 url = urllib3.util.parse_url(url)
             self.__url = url
 
-            if not isinstance(out_fn, basestring):
+            if not isinstance(out_fn, (bytes, str)):
                 raise TypeError(__("Путь должен быть строкой."))
 
-            if not isinstance(out_fn, unicode):
+            if not isinstance(out_fn, str):
                 out_fn = out_fn.decode("utf_8")
 
             self.__out_fn = path.abspath(out_fn)

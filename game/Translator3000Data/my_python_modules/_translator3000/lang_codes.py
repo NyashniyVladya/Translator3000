@@ -13,13 +13,13 @@ def _format(t):
 
 def _get_available_translators():
     variants = set()
-    for translators_dict in consts.LANG_CODES.itervalues():
-        variants.update(translators_dict.iterkeys())
+    for translators_dict in consts.LANG_CODES.values():
+        variants.update(translators_dict.keys())
     return frozenset(variants)
 
 
 _names_format_mappiing = dict(
-    map(lambda x: (_format(x), x), consts.LANG_CODES.iterkeys())
+    map(lambda x: (_format(x), x), consts.LANG_CODES.keys())
 )
 _available_translators = _get_available_translators()
 
@@ -30,7 +30,7 @@ def get_languages_for_translator(translator_name):
         raise ValueError(
             "Translator '{0}' is not found.".format(translator_name)
         )
-    for lang_name, translators_variants in consts.LANG_CODES.iteritems():
+    for lang_name, translators_variants in consts.LANG_CODES.items():
         if translator_name in translators_variants:
             yield lang_name
 
@@ -41,21 +41,21 @@ def get_lang_codes_for_translator(translator_name):
         raise ValueError(
             "Translator '{0}' is not found.".format(translator_name)
         )
-    for translators_variants in consts.LANG_CODES.itervalues():
+    for translators_variants in consts.LANG_CODES.values():
         if translator_name in translators_variants:
             yield translators_variants[translator_name][0]
 
 
 def get_lang_name(language_data):
 
-    if not isinstance(language_data, basestring):
+    if not isinstance(language_data, (bytes, str)):
         raise TypeError("Language id should be a string.")
 
     _language_data = _format(language_data)
-    for lang_name, translators_variants in consts.LANG_CODES.iteritems():
+    for lang_name, translators_variants in consts.LANG_CODES.items():
         variants = set()
         variants.add(_format(lang_name))
-        for _variants in translators_variants.itervalues():
+        for _variants in translators_variants.values():
             variants.update(map(_format, _variants))
         if _language_data in variants:
             return lang_name

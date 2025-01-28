@@ -23,7 +23,7 @@ class _DataSaver(object):
 
     def __init__(self, data, out_fn):
 
-        if isinstance(data, basestring):
+        if isinstance(data, (bytes, str)):
             self.__bytedata = data
         elif (hasattr(data, "read") and hasattr(data, "seek")):
             #  file-like object
@@ -40,10 +40,10 @@ class _DataSaver(object):
         if not isinstance(self.__bytedata, bytes):
             self.__bytedata = self.__bytedata.encode("utf_8")
 
-        if not isinstance(out_fn, basestring):
+        if not isinstance(out_fn, (bytes, str)):
             raise TypeError("'out_fn' should be a string.")
 
-        if not isinstance(out_fn, unicode):
+        if not isinstance(out_fn, str):
             out_fn = out_fn.decode(self._get_filesystemencoding())
         self.__filename = path.abspath(out_fn)
 
@@ -58,7 +58,7 @@ class _DataSaver(object):
 
     @classmethod
     def _create_dir_for_file(cls, filename):
-        if not isinstance(filename, unicode):
+        if not isinstance(filename, str):
             filename = filename.decode(cls._get_filesystemencoding())
         filename = path.abspath(filename)
         directory = path.dirname(filename)
@@ -83,7 +83,7 @@ class _DataSaver(object):
 
 def remove_dir(dirname):
 
-    if not isinstance(dirname, unicode):
+    if not isinstance(dirname, str):
         dirname = dirname.decode(_DataSaver._get_filesystemencoding())
     dirname = path.abspath(dirname)
 

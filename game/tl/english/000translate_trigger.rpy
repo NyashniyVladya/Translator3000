@@ -355,3 +355,23 @@ translate english strings:
     old "Присоединиться к Discord сообществу."
     new "Join Discord community."
 
+# TODO: Translation updated at 2025-01-28 16:31
+
+translate english strings:
+
+    # game/000translate_trigger.rpy:16
+    old "Вступить в группу в Telegram."
+    new "Join the group on Telegram."
+
+    # game/000translate_trigger.rpy:23
+    old "Дополнительные функции."
+    new "Extra features."
+
+    # game/000translate_trigger.rpy:24
+    old "Доступно в основной версии на Boosty и Patreon!"
+    new "Available in the main version on Boosty and Patreon!"
+
+    # game/000translate_trigger.rpy:72
+    old "Редактировать комбинации клавиш."
+    new "Edit key combinations."
+

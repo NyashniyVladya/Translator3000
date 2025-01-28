@@ -76,10 +76,10 @@ class TranslatorAbstract(object):
         quote_func = (urllib.quote_plus if space_is_plus else urllib.quote)
 
         query = set()
-        for k, v in param_dict.iteritems():
-            if isinstance(k, unicode):
+        for k, v in param_dict.items():
+            if isinstance(k, str):
                 k = k.encode("utf_8", "ignore")
-            if isinstance(v, unicode):
+            if isinstance(v, str):
                 v = v.encode("utf_8", "ignore")
             k, v = map(quote_func, map(str, (k, v)))
             query.add("{}={}".format(k, v))
@@ -102,10 +102,10 @@ class TranslatorAbstract(object):
                     ensure_ascii=False
                 )
 
-            if isinstance(database_dump_bytes, unicode):
+            if isinstance(database_dump_bytes, str):
                 database_dump_bytes = database_dump_bytes.encode("utf_8")
 
-            if isinstance(l_database_dump_bytes, unicode):
+            if isinstance(l_database_dump_bytes, str):
                 l_database_dump_bytes = l_database_dump_bytes.encode("utf_8")
 
             utils.save_data_to_file(database_dump_bytes, self.DATABASE_FN)
@@ -123,7 +123,7 @@ class TranslatorAbstract(object):
         if not text:
             return u""
 
-        if not isinstance(text, unicode):
+        if not isinstance(text, str):
             text = text.decode("utf_8", "ignore")
 
         parts = tuple(self.get_parts_from_text(text))
@@ -220,13 +220,13 @@ class TranslatorAbstract(object):
 
                 self.LOGGER.debug("Local cache cleanup requested.")
 
-                for lang, texts in self._local_db.iteritems():
+                for lang, texts in self._local_db.items():
                     if lang not in self._database:
                         continue
-                    for text, dest_langs in texts.iteritems():
+                    for text, dest_langs in texts.items():
                         if text not in self._database[lang]:
                             continue
-                        for dest_lang in dest_langs.iterkeys():
+                        for dest_lang in dest_langs.keys():
                             self._database[lang][text].pop(dest_lang, None)
                             if not self._database[lang][text]:
                                 self._database[lang].pop(text, None)
@@ -245,9 +245,9 @@ class TranslatorAbstract(object):
 
     @staticmethod
     def get_parts_from_text(text):
-        if not isinstance(text, basestring):
+        if not isinstance(text, (bytes, str)):
             raise TypeError("'text' should be a string.")
-        if not isinstance(text, unicode):
+        if not isinstance(text, str):
             text = text.decode("utf_8")
         for t in text.split(u'\n'):
             yield t

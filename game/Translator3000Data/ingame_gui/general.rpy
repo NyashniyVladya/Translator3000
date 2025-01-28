@@ -17,7 +17,7 @@ init -37 python in _translator3000_gui:
 
         @staticmethod
         def _unicode_path(name):
-            if not isinstance(name, basestring):
+            if not isinstance(name, (bytes, str)):
                 raise TypeError(self.translate("Путь должен быть строкой."))
             return renpy.fsdecode(name)
 
@@ -111,7 +111,7 @@ init -37 python in _translator3000_gui:
                             result["dirs"].add(filename)
 
             return dict(
-                map(lambda x: (x[0], tuple(sorted(x[1]))), result.iteritems())
+                map(lambda x: (x[0], tuple(sorted(x[1]))), result.items())
             )
 
         @classmethod
@@ -177,6 +177,17 @@ init -37 python in _translator3000_gui:
             self._current_menu_stack.append(dest_screen)
             return renpy.run(
                 store.ShowMenu(dest_screen, *screen_args, **screen_kwargs)
+            )
+
+        def FunctionPlaceholderAction(self):
+            return (
+                store.Notify(
+                    self.translate(
+                        "Доступно в основной версии на Boosty и Patreon!",
+                        not_translate_mark=False
+                    )
+                ),
+                store.OpenURL("https://boosty.to/nyashniyvladya")
             )
 
         def ConfirmAction(self, message, action):
@@ -311,7 +322,7 @@ init -37 python in _translator3000_gui:
             Второе - модификатор (unicode).
             """
             modifier = ""
-            value = unicode(value)
+            value = str(value)
             if value[0] in "+-":
                 modifier, value = value[0], value[1:]
             if not value.isdigit():
@@ -400,9 +411,9 @@ init -37 python in _translator3000_gui:
             Небольшая обёртка над 'renpy.translation.translate_string'.
             По сути, аналог ренпаевского '__', но с конкретным указанием языка.
             """
-            if not isinstance(text, basestring):
+            if not isinstance(text, (bytes, str)):
                 raise TypeError("'text' should be a string.")
-            if not isinstance(text, unicode):
+            if not isinstance(text, str):
                 text = text.decode("utf_8")
             if language is None:
                 language = self.gui_language

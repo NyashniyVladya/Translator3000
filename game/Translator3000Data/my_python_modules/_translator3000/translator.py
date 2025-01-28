@@ -24,17 +24,17 @@ class Translator(object):
     def __init__(self):
 
         self.__translators = {}
-        for translator_name, _Translator in self.CLASSES.iteritems():
+        for translator_name, _Translator in self.CLASSES.items():
             self.__translators[translator_name.lower()] = _Translator()
 
     def get_available_translator_services(self):
-        return tuple(sorted(self.__translators.iterkeys()))
+        return tuple(sorted(self.__translators.keys()))
 
     def _get_translator(self, service):
 
         _service = service.strip().lower()
         if _service not in self.__translators:
-            for new_name, aliases in self.alias_mapping.iteritems():
+            for new_name, aliases in self.alias_mapping.items():
                 if _service in aliases:
                     _service = new_name.strip().lower()
                     break

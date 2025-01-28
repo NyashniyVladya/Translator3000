@@ -1,10 +1,9 @@
 
 init -10 python in _translator3000:
 
-    # Минимальная поддерживаемая версия Ren'Py - 6.99.12.4.
-    # Код пишется с расчётом, что дефолтные строки являются юникодом.
+    # Минимальная поддерживаемая версия Ren'Py - 8.0.3.
 
-    import __builtin__
+    import builtins
     import time
     import types
     import copy
@@ -36,7 +35,7 @@ init -10 python in _translator3000:
     else:
         from requests.packages import urllib3
 
-    VERSION = (2, 10, 9)
+    VERSION = (2, 10, 10)
 
     DEBUG = False
     parent_logger.setLevel((logging.DEBUG if DEBUG else logging.CRITICAL))
