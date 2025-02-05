@@ -28,7 +28,7 @@ class _DataSaver(object):
         elif (hasattr(data, "read") and hasattr(data, "seek")):
             #  file-like object
             data.seek(0)
-            self.__bytedata = ""
+            self.__bytedata = b""
             while True:
                 _chunk = data.read((2 ** 20))
                 if not _chunk:

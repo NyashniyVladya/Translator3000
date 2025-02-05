@@ -187,6 +187,7 @@ init -37 python in _translator3000_gui:
                         not_translate_mark=False
                     )
                 ),
+                store.OpenURL("https://www.patreon.com/join/NyashniyVladya"),
                 store.OpenURL("https://boosty.to/nyashniyvladya")
             )
 
